@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block current_page %} • top artists (yearly){% endblock %}
+{% block content %}
+<table>
+<tr style="vertical-align: top">
+  {% for year, chart in charts %}
+  <td style="border-right: 1px solid;">
+    <h3>{{ year }}</h3>
+    <table style="width: 300px">
+      <tr><th>#</th><th>plays</th><th>artist</th></tr>
+      {% for position in chart[:show_count] %}
+        <tr>
+        <td>
+          {{ loop.index }}
+            {% if year in position_changes and position.artist in position_changes[year] %}
+              {% if position_changes[year][position.artist] == 'new' %}
+                <span style="color: #880">new</span>
+              {% elif position_changes[year][position.artist] > 0 %}
+                <span style="color: #080">↑{{ position_changes[year][position.artist] }}</span>
+              {% elif position_changes[year][position.artist] < 0 %}
+                <span style="color: #800">↓{{ position_changes[year][position.artist] }}</span>
+              {% elif position_changes[year][position.artist] == 0 %}
+                <span style="color: #888">↕0︎</span>
+              {% endif %}
+            {% endif %}
+        </td>
+          <td>{{ position.plays }}</td>
+          <td>{{ position.artist }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </td>
+  {% endfor %}
+</tr>
+</table>
+{% endblock %}

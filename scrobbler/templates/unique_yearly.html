@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block current_page %} • Unique stats (yearly){% endblock %}
+{% block content %}
+<table>
+  <tr><th>Year</th><th>Total scrobbles</th><th>Unique artists</th><th>Unique tracks</th></tr>
+  {% for year, (scrobbles, artists, tracks) in stats %}
+    <tr><td>{{ year }}</td><td>{{ scrobbles }}</td><td>{{ artists }}</td><td>{{ tracks }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

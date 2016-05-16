@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block current_page %} • top tracks{% endblock %}
+{% block content %}
+<table>
+  <tr><th>#</th><th>Artist</th><th>Track</th></tr>
+  {% for position in chart %}
+    <tr><td>{{ position.plays }}</td><td>{{ position.artist }}</td><td>{{ position.track }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

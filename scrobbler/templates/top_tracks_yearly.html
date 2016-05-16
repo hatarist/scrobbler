@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block current_page %} • Top artists (yearly){% endblock %}
+{% block content %}
+<table>
+<tr style="vertical-align: top">
+  {% for year, chart in charts %}
+  <td style="border-right: 1px solid;">
+    <h3>{{ year }}</h3>
+    <table style="width: 300px">
+      <tr><th>#</th><th>plays</th><th>track</th></tr>
+      {% for position in chart[:show_count] %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ position.plays }}</td>
+          <td>{{ position.artist }} - {{ position.track }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </td>
+  {% endfor %}
+</tr>
+</table>
+{% endblock %}

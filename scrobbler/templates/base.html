@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon" />
+</head>
+
+  <body>
+    <h2><a href="{{ url_for('webui.index') }}">scrobbler</a>{% block current_page %}{% endblock %}</h2>
+    {% block content %}{% endblock %}
+  </body>
+</html>

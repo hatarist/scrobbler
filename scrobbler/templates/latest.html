@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block current_page %} • last scrobbles{% endblock %}
+{% block content %}
+<table>
+  <tr><th>#</th><th>Scrobbled</th><th>Track</th></tr>
+  {% for scrobble in scrobbles %}
+    <tr><td>{{ scrobble.id }}</td><td>{{ scrobble.time }}</td><td>{{ scrobble.artist }} &ndash; {{ scrobble.track }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}
