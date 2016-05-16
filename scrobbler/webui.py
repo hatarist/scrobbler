@@ -2,7 +2,7 @@
 
 import datetime
 
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 from sqlalchemy import func
 
 from scrobbler import db
@@ -179,3 +179,12 @@ def unique_yearly():
     stats = stats.items()
 
     return render_template('unique_yearly.html', stats=stats)
+
+
+@blueprint.route("/milestones/")
+def milestones():
+    step = request.args.get('step', 10000)
+    max_id = db.session.query(func.max(Scrobble.id).label('max_id')).first().max_id
+    m_list = range(step, max_id, step)
+    scrobbles = db.session.query(Scrobble).filter(Scrobble.id.in_(m_list)).order_by(Scrobble.id.desc())
+    return render_template('milestones.html', scrobbles=scrobbles)

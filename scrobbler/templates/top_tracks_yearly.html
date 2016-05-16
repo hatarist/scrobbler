@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% block current_page %} • Top artists (yearly){% endblock %}
+{% block title %}Top yearly artists{% endblock %}
 {% block content %}
-<table>
+<table class="table table-bordered table-striped table-condensed">
 <tr style="vertical-align: top">
   {% for year, chart in charts %}
   <td style="border-right: 1px solid;">

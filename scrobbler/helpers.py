@@ -1,8 +1,9 @@
+import datetime
 import hashlib
 
 from collections import defaultdict
 
-from scrobbler import db
+from scrobbler import app, db
 from scrobbler.constants import AUTH_KEY_MAPPING, SCROBBLE_KEY_MAPPING
 from scrobbler.models import User
 
@@ -68,3 +69,38 @@ def parse_scrobble_request(args):
     scrobbles = sorted(scrobbles.values(), key=lambda d: d.get('i', 0))
 
     return (session_id, scrobbles)
+
+
+@app.template_filter('timesince')
+def timesince(d, now=None):
+    chunks = (
+        (60 * 60 * 24 * 365, 'year'),
+        (60 * 60 * 24 * 30, 'month'),
+        (60 * 60 * 24 * 7, 'week'),
+        (60 * 60 * 24, 'day'),
+        (60 * 60, 'hour'),
+        (60, 'minute'),
+        (1, 'second')
+    )
+
+    if not isinstance(d, datetime.datetime):
+        d = datetime.datetime.fromtimestamp(d)
+    if now and not isinstance(now, datetime.datetime):
+        now = datetime.datetime.fromtimestamp(now)
+
+    if not now:
+        now = datetime.datetime.now()
+
+    delta = now - (d - datetime.timedelta(0, 0, d.microsecond))
+    since = delta.days * 24 * 60 * 60 + delta.seconds
+    if since <= 0:
+        return 'in the future'
+    for i, (seconds, name) in enumerate(chunks):
+        count = since // seconds
+        if count != 0:
+            break
+
+    if count > 1:
+        name += 's'
+
+    return '%(number)d %(type)s ago' % {'number': count, 'type': name}
