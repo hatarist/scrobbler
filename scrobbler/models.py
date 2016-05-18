@@ -1,6 +1,5 @@
 import datetime
 
-from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.types import TypeDecorator, Integer
 
 from scrobbler import db
@@ -61,10 +60,6 @@ class BaseScrobble():
 
     # Optional information
     musicbrainz = db.Column(db.String(255))
-
-    @hybrid_property
-    def title(self):
-        return self.artist + " - " + self.track
 
     def __init__(self, **kwargs):
         self.time = kwargs.pop('timestamp', kwargs.pop('time', None))

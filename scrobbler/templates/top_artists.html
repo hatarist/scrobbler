@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Top weekly artists{% endblock %}
+{% block title %}Top artists{% endblock %}
 {% block content %}
 <table class="table table-bordered table-striped table-condensed">
-  <tr><th>#</th><th>Artist</th><th>Plays</th></tr>
-  {% for place, position in chart %}
-    <tr><td>{{ place }}</td><td>{{ position.artist }}</td><td>{{ position.plays }}</td></tr>
+  <tr><th>#</th><th>Artist</th><th>Scrobbles</th></tr>
+  {% for place, scrobble in chart %}
+    <tr><td>{{ place }}</td><td>{{ scrobble.artist }}</td><td>{{ scrobble.count }}</td></tr>
   {% endfor %}
 </table>
 {% endblock %}

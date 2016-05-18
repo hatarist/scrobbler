@@ -1,18 +1,31 @@
 {% extends "base.html" %}
-{% block title %}Top yearly artists{% endblock %}
+{% block title %}Top yearly tracks{% endblock %}
 {% block content %}
-<table class="table table-bordered table-striped table-condensed">
+<table class="table">
 <tr style="vertical-align: top">
   {% for year, chart in charts %}
   <td style="border-right: 1px solid;">
     <h3>{{ year }}</h3>
-    <table style="width: 300px">
-      <tr><th>#</th><th>plays</th><th>track</th></tr>
-      {% for position in chart[:show_count] %}
+    <table style="width: 300px" class="table table-bordered table-striped table-condensed">
+      <tr><th>#</th><th>Scrobbles</th><th>Track</th></tr>
+      {% for scrobble in chart[:show_count] %}
         <tr>
-          <td>{{ loop.index }}</td>
-          <td>{{ position.plays }}</td>
-          <td>{{ position.artist }} - {{ position.track }}</td>
+        <td>
+          {{ loop.index }}
+            <!-- {% if year in position_changes and scrobble.artist + ' – ' + scrobble.track in position_changes[year] %}
+              {% if position_changes[year][scrobble.artist + ' – ' + scrobble.track] == 'new' %}
+                <span style="color: #880">new</span>
+              {% elif position_changes[year][scrobble.artist + ' – ' + scrobble.track] > 0 %}
+                <span style="color: #080">↑{{ position_changes[year][scrobble.artist + ' – ' + scrobble.track] }}</span>
+              {% elif position_changes[year][scrobble.artist + ' – ' + scrobble.track] < 0 %}
+                <span style="color: #800">↓{{ position_changes[year][scrobble.artist + ' – ' + scrobble.track] }}</span>
+              {% elif position_changes[year][scrobble.artist + ' – ' + scrobble.track] == 0 %}
+                <span style="color: #888">↕0︎</span>
+              {% endif %}
+            {% endif %} -->
+        </td>
+          <td>{{ scrobble.count }}</td>
+          <td>{{ scrobble.artist }} – {{ scrobble.track }}</td>
         </tr>
       {% endfor %}
     </table>

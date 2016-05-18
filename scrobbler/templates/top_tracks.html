@@ -2,9 +2,9 @@
 {% block title %}Top tracks{% endblock %}
 {% block content %}
 <table class="table table-bordered table-striped table-condensed">
-  <tr><th>#</th><th>Artist</th><th>Track</th></tr>
-  {% for position in chart %}
-    <tr><td>{{ position.plays }}</td><td>{{ position.artist }}</td><td>{{ position.track }}</td></tr>
+  <tr><th>#</th><th>Track</th><th>Scrobbles</th></tr>
+  {% for place, scrobble in chart %}
+    <tr><td>{{ place }}</td><td>{{ scrobble.artist }} – {{ scrobble.track }}</td><td>{{ scrobble.count }}</td></tr>
   {% endfor %}
 </table>
 {% endblock %}
