@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Settings
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <h4>Change API password</h4>
+  <div class="col-md-6">
+    <form class="form-horizontal" action="{{ url_for('webui.settings') }}" method="post">
+      {{ form_api_pass.csrf_token }}
+      <div class="form-group">
+        {{ form_api_pass.current_password.label(class_="col-sm-4 control-label") }}
+        <div class="col-sm-6">
+          {{ form_api_pass.current_password(class_="form-control") }}
+        </div>
+      </div>
+      <div class="form-group">
+        {{ form_api_pass.password.label(class_="col-sm-4 control-label") }}
+        <div class="col-sm-6">
+          {{ form_api_pass.password(class_="form-control") }}
+        </div>
+      </div>
+      <div class="form-group">
+        {{ form_api_pass.repeat_password.label(class_="col-sm-4 control-label") }}
+        <div class="col-sm-6">
+          {{ form_api_pass.repeat_password(class_="form-control") }}
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-4 col-sm-6">
+          {{ form_api_pass.api_pass(class_="btn btn-default") }}
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="col-sm-3"></div>
+</div>
+<div class="row">
+  <h4>Change WebUI password</h4>
+  <div class="col-md-6">
+    <form class="form-horizontal" action="{{ url_for('webui.settings') }}" method="post">
+      {{ form_webui_pass.csrf_token }}
+
+      <div class="form-group">
+        {{ form_webui_pass.current_password.label(class_="col-sm-4 control-label") }}
+        <div class="col-sm-6">
+          {{ form_webui_pass.current_password(class_="form-control") }}
+        </div>
+      </div>
+      <div class="form-group">
+        {{ form_webui_pass.password.label(class_="col-sm-4 control-label") }}
+        <div class="col-sm-6">
+          {{ form_webui_pass.password(class_="form-control") }}
+        </div>
+      </div>
+      <div class="form-group">
+        {{ form_webui_pass.repeat_password.label(class_="col-sm-4 control-label") }}
+        <div class="col-sm-6">
+          {{ form_webui_pass.repeat_password(class_="form-control") }}
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-4 col-sm-6">
+          {{ form_webui_pass.webui_pass(class_="btn btn-default") }}
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="col-sm-3"></div>
+</div>
+{% endblock %}

@@ -10,7 +10,12 @@ from sqlalchemy import func
 from scrobbler import db
 from scrobbler.models import Scrobble, User
 from scrobbler.webui.consts import PERIODS
-from scrobbler.webui.forms import LoginForm, RegisterForm
+from scrobbler.webui.forms import (
+    LoginForm,
+    RegisterForm,
+    ChangeAPIPasswordForm,
+    ChangeWebUIPasswordForm,
+)
 from scrobbler.webui.helpers import show_form_errors
 
 blueprint = Blueprint('webui', __name__)
@@ -360,7 +365,7 @@ def login():
             User.username == form.username.data,
         ).first()
 
-        if user is None or not user.validate_password(form.password.data):
+        if user is None or not user.validate_webui_password(form.password.data):
             abort(403)
 
         login_user(user, remember=form.remember_me.data)
@@ -377,3 +382,36 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('webui.index'))
+
+
+@blueprint.route("/settings/", methods=["GET", "POST"])
+@login_required
+def settings():
+    form_api_pass = ChangeAPIPasswordForm()
+    form_webui_pass = ChangeWebUIPasswordForm()
+
+    if form_api_pass.validate_on_submit() and form_api_pass.api_pass.data:
+        if current_user.api_password != form_api_pass.current_password.data:
+            flash("Wrong current API password.", 'error')
+        else:
+            current_user.api_password = form_api_pass.password.data
+            db.session.commit()
+            flash("API password has been changed.", 'success')
+    else:
+        show_form_errors(form_api_pass)
+
+    if form_webui_pass.validate_on_submit() and form_webui_pass.webui_pass.data:
+        if current_user.webui_password != form_webui_pass.current_password.data:
+            flash("Wrong current WebUI password.", 'error')
+        else:
+            current_user.webui_password = form_webui_pass.password.data
+            db.session.commit()
+            flash("WebUI password has been changed.", 'success')
+    else:
+        show_form_errors(form_webui_pass)
+
+    return render_template(
+        'settings.html',
+        form_api_pass=form_api_pass,
+        form_webui_pass=form_webui_pass,
+    )

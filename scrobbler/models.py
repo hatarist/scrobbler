@@ -60,8 +60,11 @@ class User(db.Model):
     def _set_webui_password(self, data):
         self._webui_password = bcrypt.generate_password_hash(data)
 
-    def validate_password(self, data):
+    def validate_api_password(self, data):
         return self.api_password == md5(data)
+
+    def validate_webui_password(self, data):
+        return bcrypt.check_password_hash(self.webui_password, data)
 
     @property
     def is_authenticated(self):

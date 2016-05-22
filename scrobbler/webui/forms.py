@@ -1,5 +1,5 @@
 from flask_wtf import Form
-from wtforms import BooleanField, PasswordField, StringField
+from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import Required, Optional, Length, EqualTo, Email
 
 
@@ -17,3 +17,20 @@ class RegisterForm(Form):
         EqualTo('repeat_password', message='Passwords must match')
     ])
     repeat_password = PasswordField('Repeat password')
+
+
+class BaseChangePasswordForm(Form):
+    current_password = PasswordField('Current password', [Required()])
+    password = PasswordField('New password', [
+        Required(),
+        EqualTo('repeat_password', message='Passwords must match')
+    ])
+    repeat_password = PasswordField('Repeat password')
+
+
+class ChangeAPIPasswordForm(BaseChangePasswordForm):
+    api_pass = SubmitField('Change password')
+
+
+class ChangeWebUIPasswordForm(BaseChangePasswordForm):
+    webui_pass = SubmitField('Change password')
