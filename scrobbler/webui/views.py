@@ -399,7 +399,7 @@ def settings():
     form_webui_pass = ChangeWebUIPasswordForm()
 
     if form_api_pass.validate_on_submit() and form_api_pass.api_pass.data:
-        if current_user.api_password != form_api_pass.current_password.data:
+        if not current_user.validate_api_password(form_api_pass.current_password.data):
             flash("Wrong current API password.", 'error')
         else:
             current_user.api_password = form_api_pass.password.data
@@ -409,7 +409,7 @@ def settings():
         show_form_errors(form_api_pass)
 
     if form_webui_pass.validate_on_submit() and form_webui_pass.webui_pass.data:
-        if current_user.webui_password != form_webui_pass.current_password.data:
+        if not current_user.validate_webui_password(form_webui_pass.current_password.data):
             flash("Wrong current WebUI password.", 'error')
         else:
             current_user.webui_password = form_webui_pass.password.data

@@ -64,7 +64,10 @@ class User(db.Model):
         return self.api_password == md5(data)
 
     def validate_webui_password(self, data):
-        return bcrypt.check_password_hash(self.webui_password, data)
+        try:
+            return bcrypt.check_password_hash(self.webui_password, data)
+        except ValueError:
+            return False
 
     @property
     def is_authenticated(self):
