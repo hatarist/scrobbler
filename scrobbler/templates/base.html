@@ -21,12 +21,8 @@
   <body>
     {% include "partials/navbar.html" %}
     <div class="container">
-      <div class="col-md-1"></div>
-      <div class="col-md-10">
-        <h2>{% block title %}{% endblock %}</h2>
-        {% block content %}{% endblock %}
-      </div>
-      <div class="col-md-1"></div>
+      <h2>{% block title %}{% endblock %}</h2>
+      {% block content %}{% endblock %}
     </div>
   </body>
 </html>

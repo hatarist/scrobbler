@@ -108,4 +108,4 @@ def timesince(d, now=None):
 
 @app.context_processor
 def periods():
-    return {'periods': PERIODS.items()}
+    return {'PERIODS': PERIODS}

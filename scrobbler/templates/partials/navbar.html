@@ -14,16 +14,44 @@
       <ul class="nav navbar-nav">
 
         {% set elements = [
-          (url_for('webui.dashboard'), 'Dashboard'),
-          (url_for('webui.last_scrobbles'), 'Latest'),
-          (url_for('webui.top_artists'), 'Top Charts'),
-          (url_for('webui.milestones'), 'Milestones'),
+          ("Dashboard", [
+            url_for('webui.dashboard')
+          ]),
+
+          ("Latest", [
+            url_for('webui.last_scrobbles')
+          ]),
+
+          ("Charts", [
+            (url_for('webui.top_artists'), "Top Artists"),
+            (url_for('webui.top_tracks'), "Top Tracks")
+          ]),
+
+          ("Milestones", [
+            url_for('webui.milestones')
+          ])
+
         ] %}
 
-        {% for url, name in elements %}
-          <li{% if url in request.path %} class="active"{% endif %}>
-            <a href="{{ url }}">{{ name }}</a>
-          </li>
+        {% for name, urls in elements %}
+          {% if urls|length > 1 %}
+            <li class="dropdown {% for url, subname in urls %}{% if url in request.path %}active{% endif %}{% endfor %}">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                {{ name }} <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu">
+                {% for url, subname in urls %}
+                  <li{% if url in request.path %} class="active"{% endif %}>
+                    <a href="{{ url }}">{{ subname }}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </li>
+          {% else %}
+            <li{% if urls[0] in request.path %} class="active"{% endif %}>
+              <a href="{{ urls[0] }}">{{ name }}</a>
+            </li>
+          {% endif %}
         {% endfor %}
 
       </ul>

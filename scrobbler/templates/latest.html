@@ -1,18 +1,21 @@
 {% extends "base.html" %}
-{% block title %}Latest played{% endblock %}
+
+{% block title %}
+  Latest scrobbles
+{% endblock %}
+
 {% block content %}
-<table class="table table-bordered table-striped table-condensed">
-  <tr>
-    <th class="col-md-1">#</th>
-    <th class="col-md-2">Scrobbled</th>
-    <th class="col-md-9">Track</th>
-  </tr>
+<div class="col-md-9">
+<table class="table table-striped table-condensed table-hover chart">
+  {# <tr><th class="col-md-1 id">#</th><th class="col-md-9 name">Track</th><th class="col-md-2 time">Scrobbled</th></tr> #}
   {% for scrobble in scrobbles %}
     <tr>
-      <td>{{ scrobble.id }}</td>
-      <td>{{ scrobble.time|timesince }}</td>
-      <td>{{ scrobble.artist }} – {{ scrobble.track }}</td>
+      <td class="id">{{ scrobble.id }}</td>
+      <td class="name">{{ scrobble.artist }} – {{ scrobble.track }}</td>
+      <td class="time"><span title="{{ scrobble.time }}">{{ scrobble.time|timesince }}</span></td>
     </tr>
   {% endfor %}
 </table>
+</div>
+<div class="col-md-3"></div>
 {% endblock %}

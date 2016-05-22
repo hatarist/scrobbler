@@ -1,13 +1,28 @@
 {% extends "base.html" %}
-{% from 'partials/macros.html' import select_period %}
+{% from 'partials/macros.html' import select_period, select_metatype with context %}
+
 {% block title %}
-  Top artists {{ select_period('webui.top_artists', period, periods) }}
+  Top {{ select_metatype('artists') }} for {{ select_period('webui.top_artists', period) }}
 {% endblock %}
+
 {% block content %}
-<table class="table table-bordered table-striped table-condensed">
-  <tr><th>#</th><th>Artist</th><th>Scrobbles</th></tr>
+<div class="col-md-9">
+<table class="table table-striped table-condensed table-hover chart">
+  {# <tr><th class="place">#</th><th class="name">Artist</th><th class="scrobbles">Scrobbles</th></tr> #}
   {% for place, scrobble in chart %}
-    <tr><td>{{ place }}</td><td>{{ scrobble.artist }}</td><td>{{ scrobble.count }}</td></tr>
+    <tr>
+      <td class="place">{{ place }}</td>
+      <td class="name">{{ scrobble.artist }}</td>
+      <td class="scrobbles">
+        <div class="progress">
+          <div class="progress-bar" role="progressbar" aria-valuenow="{{ scrobble.count }}" aria-valuemin="0" aria-valuemax="{{ max_count }}" style="width: {{ ((scrobble.count / max_count) * 100)|int }}%;">
+            <span>{{ scrobble.count }}</span>
+          </div>
+        </div>
+      </td>
+    </tr>
   {% endfor %}
 </table>
+</div>
+<div class="col-md-3"></div>
 {% endblock %}

@@ -13,28 +13,30 @@
             </h3>
             <table class="table table-bordered table-striped table-condensed chart yearly_chart">
             <tr>
-              <th class="place">#</th>
-              <th class="scrobbles">Scrobbles</th>
+              <th class="place_position">#</th>
               <th class="name">Artist</th>
+              <th class="scrobbles">Scrobbles</th>
             </tr>
             {% for position in chart[:show_count] %}
               <tr>
-              <td>
+              <td class="place_position">
                 {{ loop.index }}
                   {% if year in position_changes and position.artist in position_changes[year] %}
                     {% if position_changes[year][position.artist] == 'new' %}
-                      <span style="color: #880">new</span>
+                      <span class="label label-warning">new</span>
                     {% elif position_changes[year][position.artist] > 0 %}
-                      <span style="color: #080">↑{{ position_changes[year][position.artist] }}</span>
+                      <span class="label label-success">▲ {{ position_changes[year][position.artist] }}</span>
                     {% elif position_changes[year][position.artist] < 0 %}
-                      <span style="color: #800">↓{{ position_changes[year][position.artist] }}</span>
+                      <span class="label label-danger">▼ {{ position_changes[year][position.artist] }}</span>
                     {% elif position_changes[year][position.artist] == 0 %}
-                      <span style="color: #888">↕0︎</span>
+                      <span class="label label-default">↕0︎</span>
                     {% endif %}
+                  {% else %}
+                    <span class="label label-warning">new</span>
                   {% endif %}
               </td>
-                <td>{{ position.count }}</td>
-                <td>{{ position.artist }}</td>
+                <td class="name">{{ position.artist }}</td>
+                <td class="scrobbles">{{ position.count }}</td>
               </tr>
             {% endfor %}
             </table>

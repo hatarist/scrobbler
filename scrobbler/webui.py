@@ -28,7 +28,7 @@ def last_scrobbles():
     scrobbles = (db.session
                  .query(Scrobble.id, Scrobble.artist, Scrobble.track, Scrobble.time)
                  .order_by(Scrobble.time.desc())
-                 .limit(app.config['RESULTS_COUNT'])
+                 .limit(request.args.get('count', app.config['RESULTS_COUNT']))
                  .all()
                  )
     return render_template('latest.html', scrobbles=scrobbles)
@@ -46,12 +46,14 @@ def top_artists(period=None):
              .group_by(func.lower(Scrobble.artist))
              .filter(Scrobble.time >= time_from)
              .order_by(scrobbles.desc())
-             .limit(app.config['RESULTS_COUNT'])
+             .limit(request.args.get('count', app.config['RESULTS_COUNT']))
              .all()
              )
+
+    max_count = chart[0][1]
     chart = enumerate(chart, start=1)
 
-    return render_template('top_artists.html', period=period, chart=chart)
+    return render_template('top_artists.html', period=period, chart=chart, max_count=max_count)
 
 
 @blueprint.route("/top/tracks/")
@@ -66,12 +68,14 @@ def top_tracks(period=None):
              .group_by(func.lower(Scrobble.artist), func.lower(Scrobble.track))
              .filter(Scrobble.time >= time_from)
              .order_by(scrobbles.desc())
-             .limit(app.config['RESULTS_COUNT'])
+             .limit(request.args.get('count', app.config['RESULTS_COUNT']))
              .all()
              )
+
+    max_count = chart[0][2]
     chart = enumerate(chart, start=1)
 
-    return render_template('top_tracks.html', period=period, chart=chart)
+    return render_template('top_tracks.html', period=period, chart=chart, max_count=max_count)
 
 
 @blueprint.route("/top/tracks/yearly/")

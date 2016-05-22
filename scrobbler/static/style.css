@@ -10,29 +10,80 @@ h2 {
     padding-bottom: 24px;
 }
 
-.period .dropdown {
+h2 .dropdown {
     display: inline;
 }
 
+.chart {
+    width: 100%;
+}
+
+/* latest scrobbles */
+
+.chart .id {
+    font-size: 0.8em;
+    text-align: center;
+    vertical-align: middle;
+    width: 60px;
+}
+
+.chart .time {
+    font-size: 0.85em;
+    text-align: right;
+    vertical-align: middle;
+    width: 120px;
+}
+
+/* charts */
+
+.chart tr {
+    white-space: nowrap;
+}
+
+.chart .name {
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    min-width: 300px;
+    max-width: 450px;
+}
+
+.chart .place {
+    font-size: 1.1em;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+    width: 40px;
+}
+
+.chart .place_position {
+    width: 80px;
+}
+
+.chart .place_position span {
+    font-size: 0.8em;
+    font-weight: normal;
+}
+
+.chart .scrobbles {
+    width: 200px;
+}
+
+.chart .scrobbles .progress {
+    margin-bottom: 0;
+}
+
+.chart .scrobbles .progress .progress-bar {
+    text-align: left;
+    padding-left: 0.4em;
+    min-width: 40px;
+    opacity: 0.6;
+}
+
+/* carousel (top yearly artists) */
+
 #yearly_artists {
     width: 1260px;
-}
-
-.yearly_chart {
-    width: 420px;
-    vertical-align: top;
-}
-
-.yearly_chart th.place {
-    width: 80px
-}
-
-.yearly_chart th.scrobbles {
-    width: 60px
-}
-
-.yearly_chart th.name {
-    width: 280px
+    left: -420px;
 }
 
 .carousel-inner .carousel-control {
@@ -71,5 +122,3 @@ h2 {
 .carousel-control.right {
     left: 12px;
 }
-
-.

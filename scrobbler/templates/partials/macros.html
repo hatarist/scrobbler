@@ -1,16 +1,26 @@
-{% macro select_period(url_name, period, periods) -%}
+{% macro select_period(url_name, current_period) -%}
   <div class="period dropdown">
-  <a class="dropdown-toggle" id="select_period" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" href="#">
-    {{ period }}<span class="caret"></span>
-  </a>
+  <a class="dropdown-toggle" id="select_period" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" href="#">{{ current_period }}<span class="caret"></span></a>
 
   <ul class="dropdown-menu" aria-labelledby="select_period">
-    {% for key, (value, days) in periods %}
-      {% if period == value %}
+    {% for key, (value, days) in PERIODS.items() %}
+      {% if current_period == value %}
         <li class="active"><a href="{{ url_for(url_name, period=key) }}">{{ value }}</a></li>
       {% else %}
         <li><a href="{{ url_for(url_name, period=key) }}">{{ value }}</a></li>
       {% endif %}
     {% endfor %}
+  </ul>
+{%- endmacro %}
+
+{% macro select_metatype(current_metatype) -%}
+  {% set period = request.view_args.period if request.view_args.period in PERIODS else None %}
+
+  <div class="metatype dropdown">
+  <a class="dropdown-toggle" id="select_metatype" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" href="#">{{ current_metatype }}<span class="caret"></span></a>
+
+  <ul class="dropdown-menu" aria-labelledby="select_metatype">
+    <li{% if current_metatype == 'artists' %} class="active"{% endif %}><a href="{{ url_for('webui.top_artists', period=period) }}">Artists</a></li>
+    <li{% if current_metatype == 'tracks' %} class="active"{% endif %}><a href="{{ url_for('webui.top_tracks', period=period) }}">Tracks</a></li>
   </ul>
 {%- endmacro %}
