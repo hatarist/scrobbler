@@ -1,6 +1,15 @@
+# Flask
 DEBUG = True
 
+# Flask / Flask-Login
+SECRET_KEY = 'ChangeMe'
+
+# Flask-Bcrypt
+BCRYPT_LOG_ROUNDS = 12
+
+# Flask-SQLAlchemy
 SQLALCHEMY_DATABASE_URI = 'sqlite:///../db/scrobbler.sqlite3'
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 
+# Scrobbler
 RESULTS_COUNT = 20

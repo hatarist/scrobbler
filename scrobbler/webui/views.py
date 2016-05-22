@@ -2,28 +2,40 @@
 
 import datetime
 
-from flask import abort, Blueprint, redirect, render_template, request, url_for
+from flask import abort, Blueprint, flash, redirect, render_template, request, url_for
 from flask import current_app as app
+from flask.ext.login import current_user, login_required, login_user, logout_user
 from sqlalchemy import func
 
 from scrobbler import db
-from scrobbler.constants import PERIODS
-from scrobbler.models import Scrobble
+from scrobbler.models import Scrobble, User
+from scrobbler.webui.consts import PERIODS
+from scrobbler.webui.forms import LoginForm, RegisterForm
+from scrobbler.webui.helpers import show_form_errors
 
 blueprint = Blueprint('webui', __name__)
 
 
+@blueprint.errorhandler(403)
+def forbidden(e):
+    return render_template('errors/403.html'), 403
+
+
 @blueprint.errorhandler(404)
 def page_not_found(e):
-    return render_template('404.html'), 404
+    return render_template('errors/404.html'), 404
 
 
 @blueprint.route("/")
 def index():
-    return redirect(url_for('webui.dashboard'))
+    if current_user.is_authenticated:
+        return redirect(url_for('webui.dashboard'))
+    else:
+        return render_template('index.html')
 
 
 @blueprint.route("/dashboard/")
+@login_required
 def dashboard():
     return render_template('dashboard.html')
 
@@ -58,7 +70,12 @@ def top_artists(period=None):
     max_count = chart[0][1]
     chart = enumerate(chart, start=1)
 
-    return render_template('top_artists.html', period=period, chart=chart, max_count=max_count)
+    return render_template(
+        'charts/top_artists.html',
+        period=period,
+        chart=chart,
+        max_count=max_count
+    )
 
 
 @blueprint.route("/top/tracks/")
@@ -80,7 +97,12 @@ def top_tracks(period=None):
     max_count = chart[0][2]
     chart = enumerate(chart, start=1)
 
-    return render_template('top_tracks.html', period=period, chart=chart, max_count=max_count)
+    return render_template(
+        'charts/top_tracks.html',
+        period=period,
+        chart=chart,
+        max_count=max_count
+    )
 
 
 @blueprint.route("/top/tracks/yearly/")
@@ -132,7 +154,7 @@ def top_tracks_yearly():
     charts = sorted(charts.items())
 
     return render_template(
-        'top_tracks_yearly.html',
+        'charts/top_tracks_yearly.html',
         charts=charts,
         position_changes=position_changes,
         show_count=show_count
@@ -184,7 +206,7 @@ def top_artists_yearly():
     charts = sorted(charts.items())
 
     return render_template(
-        'top_artists_yearly.html',
+        'charts/top_artists_yearly.html',
         charts=charts,
         position_changes=position_changes,
         show_count=show_count
@@ -232,10 +254,14 @@ def unique_yearly():
 
     stats = stats.items()
 
-    return render_template('unique_yearly.html', stats=stats)
+    return render_template(
+        'charts/unique_yearly.html',
+        stats=stats
+    )
 
 
 @blueprint.route("/milestones/")
+@login_required
 def milestones():
     step = request.args.get('step', 10000)
     max_id = db.session.query(func.max(Scrobble.id).label('max_id')).first().max_id
@@ -246,7 +272,10 @@ def milestones():
                  .order_by(Scrobble.id.desc())
                  )
 
-    return render_template('milestones.html', scrobbles=scrobbles)
+    return render_template(
+        'charts/milestones.html',
+        scrobbles=scrobbles
+    )
 
 
 @blueprint.route("/artist/<name>/")
@@ -297,3 +326,54 @@ def search():
     tracks = enumerate(tracks, start=1)
 
     return render_template('search.html', artists=artists, tracks=tracks)
+
+
+@blueprint.route("/register/", methods=["GET", "POST"])
+def register():
+    form = RegisterForm()
+
+    if form.validate_on_submit():
+        user = User(
+            username=form.username.data,
+            api_password=form.password.data,
+            webui_password=form.password.data,
+            email=form.email.data
+        )
+        db.session.add(user)
+        db.session.commit()
+
+        login_user(user)
+        flash('Happy scrobbling!', 'success')
+        return redirect(url_for('webui.dashboard'))
+    else:
+        show_form_errors(form)
+
+    return render_template('auth/register.html', form=form)
+
+
+@blueprint.route("/login/", methods=["GET", "POST"])
+def login():
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        user = db.session.query(User).filter(
+            User.username == form.username.data,
+        ).first()
+
+        if user is None or not user.validate_password(form.password.data):
+            abort(403)
+
+        login_user(user, remember=form.remember_me.data)
+        flash('Logged in successfully.')
+        return redirect(url_for('webui.index'))
+    else:
+        show_form_errors(form)
+
+    return render_template('auth/login.html', form=form)
+
+
+@blueprint.route("/logout/")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('webui.index'))

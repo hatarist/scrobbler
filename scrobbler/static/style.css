@@ -1,12 +1,12 @@
-.page_not_found h1 {
+.error_page h1 {
     font-size: 10em;
 }
 
-.page_not_found h3 {
+.error_page h3 {
     font-size: 7em;
 }
 
-.server_is_sad {
+.server_is_sad, .server_is_angry {
     position: relative;
     left: 0.9em;
     -webkit-transform: rotate(90deg);
@@ -14,6 +14,10 @@
     -o-transform: rotate(90deg);
     -ms-transform: rotate(90deg);
     transform: rotate(90deg);
+}
+
+.server_is_angry {
+    color: #800;
 }
 
 .navbar-custom {
@@ -24,8 +28,19 @@
     color: #dadada;
 }
 
-h2 {
+.messages {
+    margin-bottom: 25px;
+}
+
+.alert {
+    padding: 5px 10px;
+    padding-right: 30px;
+    margin: 5px;
+}
+
+h2.title {
     padding-bottom: 24px;
+    left: 0;
 }
 
 h2 .dropdown {
@@ -95,6 +110,11 @@ h2 .dropdown {
     padding-left: 0.4em;
     min-width: 40px;
     opacity: 0.6;
+}
+
+.form-group.required .control-label:after {
+    content: "*";
+    color: #d33;
 }
 
 /* carousel (top yearly artists) */

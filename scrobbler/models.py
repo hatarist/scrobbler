@@ -1,8 +1,10 @@
 import datetime
 
 from sqlalchemy.types import TypeDecorator, Integer
+from sqlalchemy.ext.hybrid import hybrid_property
 
-from scrobbler import db
+from scrobbler import bcrypt, db
+from scrobbler.api.helpers import md5
 
 
 class IntegerDateTime(TypeDecorator):
@@ -32,11 +34,45 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(255), unique=True)
-    password = db.Column(db.String(32))
+    username = db.Column(db.String(32), unique=True)
+    email = db.Column(db.String(255), unique=True)
+    _api_password = db.Column('api_password', db.String(32))
+    _webui_password = db.Column('webui_password', db.String(128))
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    created_at = db.Column(IntegerDateTime, nullable=False, default=datetime.datetime.now)
     settings = db.Column(db.String(255))
 
     sessions = db.relationship('Session', backref='user')
+
+    @hybrid_property
+    def api_password(self):
+        return self._api_password
+
+    @api_password.setter
+    def _set_api_password(self, data):
+        self._api_password = md5(data)
+
+    @hybrid_property
+    def webui_password(self):
+        return self._webui_password
+
+    @webui_password.setter
+    def _set_webui_password(self, data):
+        self._webui_password = bcrypt.generate_password_hash(data)
+
+    def validate_password(self, data):
+        return self.api_password == md5(data)
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return "{}".format(self.id)
 
 
 class Session(db.Model):

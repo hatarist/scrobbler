@@ -5,10 +5,10 @@ from time import time
 from flask import Blueprint, redirect, request, url_for
 
 from scrobbler import db
-from scrobbler.constants import PONG, RADIO_HANDSHAKE, UPDATE_CHECK
-from scrobbler.helpers import (api_response, authenticate, md5,
-                               parse_auth_request, parse_np_request, parse_scrobble_request)
-from scrobbler.models import NowPlaying, Scrobble, Session
+from scrobbler.api.consts import PONG, RADIO_HANDSHAKE, UPDATE_CHECK
+from scrobbler.api.helpers import (api_response, authenticate, md5,
+                                   parse_auth_request, parse_np_request, parse_scrobble_request)
+from scrobbler.models import NowPlaying, Scrobble, Session, User
 
 blueprint = Blueprint('api', __name__)
 
@@ -18,16 +18,15 @@ def handshake():
     handshake = request.args.get('hs')
 
     if handshake is None:
-        return redirect(url_for('webui.dashboard'))
+        return redirect(url_for('webui.index'))
 
     data = parse_auth_request(request.args)
 
     if not data:
         return api_response('BADREQUEST'), 400
 
-    user = authenticate(data['username'], data['timestamp'], data['auth'])
-
-    if not user:
+    user = db.session.query(User).filter_by(username=data['username']).first()
+    if not authenticate(user, data['timestamp'], data['auth']):
         return api_response('BADAUTH')
 
     session = db.session.query(Session).filter(Session.user_id == user.id).first()
@@ -36,7 +35,7 @@ def handshake():
         session_id = session.session_id
     else:
         current_time = str(int(time()))
-        session_id = md5(user.username + user.password + current_time)
+        session_id = md5(user.username + user.api_password + current_time)
 
         session = Session(user_id=user.id, session_id=session_id, session_time=current_time)
         db.session.add(session)
@@ -56,9 +55,8 @@ def password_check():
     if not data:
         return api_response('BADREQUEST'), 400
 
-    user = authenticate(data['username'], data['timestamp'], data['auth'])
-
-    if not user:
+    user = db.session.query(User).filter_by(username=data['username']).first()
+    if not authenticate(user, data['timestamp'], data['auth']):
         return api_response('BADPASSWORD')
 
     return api_response('OK')

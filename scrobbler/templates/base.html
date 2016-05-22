@@ -20,9 +20,12 @@
 
   <body>
     {% include "partials/navbar.html" %}
-    <div class="container">
-      <h2>{% block title %}{% endblock %}</h2>
-      {% block content %}{% endblock %}
+    {% include "partials/flash.html" %}
+
+    <div class="container container-fluid">
+      <h2 class="title">{% block title %}{% endblock %}</h2>
+      {% block content %}
+      {% endblock %}
     </div>
   </body>
 </html>

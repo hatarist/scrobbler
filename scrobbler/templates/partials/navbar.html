@@ -13,68 +13,84 @@
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
 
+        {# +- title, login_required, urls #}
+        {# +-- url, login_required, title #}
         {% set elements = [
-          ("Dashboard", [
-            url_for('webui.dashboard')
+          ("Dashboard", True, [
+            (url_for('webui.dashboard'), True, "Dashboard")
           ]),
 
-          ("Latest", [
-            url_for('webui.last_scrobbles')
+          ("Latest", True, [
+            (url_for('webui.last_scrobbles'), True, "Latest")
           ]),
 
-          ("Charts", [
-            (url_for('webui.top_artists'), "Top Artists"),
-            (url_for('webui.top_tracks'), "Top Tracks")
+          ("Charts", False, [
+            (url_for('webui.top_artists'), False, "Top Artists"),
+            (url_for('webui.top_tracks'), False, "Top Tracks")
           ]),
 
-          ("Milestones", [
-            url_for('webui.milestones')
+          ("Milestones", True, [
+            (url_for('webui.milestones'), True, "Milestones")
           ])
 
         ] %}
 
-        {% for name, urls in elements %}
+        {% for name, login_required, urls in elements %}
           {% if urls|length > 1 %}
-            <li class="dropdown {% for url, subname in urls %}{% if url in request.path %}active{% endif %}{% endfor %}">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                {{ name }} <span class="caret"></span>
-              </a>
-              <ul class="dropdown-menu">
-                {% for url, subname in urls %}
-                  <li{% if url in request.path %} class="active"{% endif %}>
-                    <a href="{{ url }}">{{ subname }}</a>
-                  </li>
-                {% endfor %}
-              </ul>
-            </li>
+            {% if not login_required or (login_required and current_user.is_authenticated) %}
+              <li class="dropdown {% for url, _, subname in urls %}{% if url in request.path %}active{% endif %}{% endfor %}">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                  {{ name }} <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                  {% for url, sub_login_required, sub_name in urls %}
+                    {% if not sub_login_required or (sub_login_required and current_user.is_authenticated) %}
+                      <li{% if url in request.path %} class="active"{% endif %}>
+                        <a href="{{ url }}">{{ sub_name }}</a>
+                      </li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              </li>
+            {% endif %}
           {% else %}
-            <li{% if urls[0] in request.path %} class="active"{% endif %}>
-              <a href="{{ urls[0] }}">{{ name }}</a>
-            </li>
+            {% if not login_required or (login_required and current_user.is_authenticated) %}
+              <li{% if urls[0][0] in request.path %} class="active"{% endif %}>
+                <a href="{{ urls[0][0] }}">{{ name }}</a>
+              </li>
+            {% endif %}
           {% endif %}
         {% endfor %}
 
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-            <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-            {{ current_user }} <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu">
-            <li><a href="#">Profile</a></li>
-            <li><a href="#">Settings</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="#">Logout</a></li>
-          </ul>
+        <li>
+          <form class="navbar-form" role="search" action="{{ url_for('webui.search') }}" method="get">
+            <div class="form-group">
+              <input type="text" class="form-control" placeholder="Search" name="q">
+            </div>
+            <button type="submit" class="btn btn-default">Submit</button>
+          </form>
         </li>
       </ul>
-      <form class="navbar-form navbar-right" role="search" action="{{ url_for('webui.search') }}" method="get">
-        <div class="form-group">
-          <input type="text" class="form-control" placeholder="Search" name="q">
-        </div>
-        <button type="submit" class="btn btn-default">Submit</button>
-      </form>
+
+      <ul class="nav navbar-nav navbar-right">
+        {% if current_user.is_authenticated %}
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+              <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+              {{ current_user.username }} <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="#">Profile</a></li>
+              <li><a href="#">Settings</a></li>
+              <li role="separator" class="divider"></li>
+              <li><a href="{{ url_for('webui.logout') }}">Logout</a></li>
+            </ul>
+          </li>
+        {% else %}
+          <li><a href="{{ url_for('webui.login') }}">Log in</a></li>
+          <li><a href="{{ url_for('webui.register') }}">Register</a></li>
+        {% endif %}
+      </ul>
     </div>
   </div>
 </nav>
