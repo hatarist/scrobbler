@@ -109,3 +109,8 @@ def timesince(d, now=None):
 @app.context_processor
 def periods():
     return {'PERIODS': PERIODS}
+
+
+@app.context_processor
+def auth_dummy():
+    return {'current_user': db.session.query(User).first().username}
