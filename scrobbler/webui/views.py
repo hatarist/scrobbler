@@ -1,5 +1,3 @@
-"""Provides a web-interface."""
-
 import datetime
 
 from flask import abort, Blueprint, flash, redirect, render_template, request, url_for

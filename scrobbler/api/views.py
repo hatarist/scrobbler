@@ -1,5 +1,3 @@
-"""Provides a basic Audioscrobbler 1.2.1 implementation."""
-
 from time import time
 
 from flask import Blueprint, redirect, request, url_for
@@ -94,8 +92,10 @@ def scrobble():
     if not session_id:
         return api_response('BADREQUEST'), 400
 
+    session = db.session.query(Session).filter(Session.session_id == session_id).first()
+
     for data in scrobbles:
-        scrobble = Scrobble(**data)
+        scrobble = Scrobble(user_id=session.user_id, **data)
         db.session.add(scrobble)
 
     db.session.commit()
