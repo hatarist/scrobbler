@@ -46,6 +46,7 @@ def dashboard():
 
 
 @blueprint.route("/latest/")
+@login_required
 def last_scrobbles():
     scrobbles = (db.session
                  .query(Scrobble.id, Scrobble.artist, Scrobble.track, Scrobble.time)
@@ -58,6 +59,7 @@ def last_scrobbles():
 
 @blueprint.route("/top/artists/")
 @blueprint.route("/top/artists/<period>/")
+@login_required
 def top_artists(period=None):
     period, days = PERIODS.get(period, PERIODS['1w'])
 
@@ -85,6 +87,7 @@ def top_artists(period=None):
 
 @blueprint.route("/top/tracks/")
 @blueprint.route("/top/tracks/<period>/")
+@login_required
 def top_tracks(period=None):
     period, days = PERIODS.get(period, PERIODS['1w'])
 
@@ -111,6 +114,7 @@ def top_tracks(period=None):
 
 
 @blueprint.route("/top/tracks/yearly/")
+@login_required
 def top_tracks_yearly():
     scrobbles = func.count(Scrobble.artist).label('count')
     charts = {}
@@ -167,6 +171,7 @@ def top_tracks_yearly():
 
 
 @blueprint.route("/top/artists/yearly/")
+@login_required
 def top_artists_yearly():
     scrobbles = func.count(Scrobble.artist).label('count')
     charts = {}
@@ -219,6 +224,7 @@ def top_artists_yearly():
 
 
 @blueprint.route("/unique/yearly/")
+@login_required
 def unique_yearly():
     stats = {}
 
@@ -284,6 +290,7 @@ def milestones():
 
 
 @blueprint.route("/artist/<name>/")
+@login_required
 def artist(name=None):
 
     scrobbles = func.count(Scrobble.track).label('count')
@@ -311,6 +318,7 @@ def artist(name=None):
 
 
 @blueprint.route("/search/")
+@login_required
 def search():
     search_query = request.args.get('q')
 
