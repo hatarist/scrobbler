@@ -1,7 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Top yearly artists{% endblock %}
-{% block content %}
 
+{% block title %}
+  Top yearly artists
+{% endblock %}
+
+{% block content %}
   <div class="carousel" data-ride="carousel" data-type="multi" data-interval="0" id="yearly_artists">
     <div class="carousel-inner">
       {% for year, chart in charts %}
@@ -45,8 +48,5 @@
         </div>
       {% endfor %}
     </div>
-
   </div>
-
-
 {% endblock %}

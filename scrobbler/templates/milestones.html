@@ -1,18 +1,25 @@
 {% extends "base.html" %}
-{% block title %}Milestones{% endblock %}
+
+{% block title %}
+  Milestones
+{% endblock %}
+
 {% block content %}
-<table class="table table-bordered table-striped table-condensed">
-  <tr>
-    <th class="col-md-1">#</th>
-    <th class="col-md-2">Scrobbled</th>
-    <th class="col-md-9">Track</th>
-  </tr>
-  {% for scrobble in scrobbles %}
+<div class="col-md-9">
+  <table class="table table-bordered table-striped table-condensed">
     <tr>
-      <td>{{ scrobble.id }}</td>
-      <td>{{ scrobble.time|timesince }}</td>
-      <td>{{ scrobble.artist }} – {{ scrobble.track }}</td>
+      <th class="col-md-1">#</th>
+      <th class="col-md-2">Scrobbled</th>
+      <th class="col-md-9">Track</th>
     </tr>
-  {% endfor %}
-</table>
+    {% for scrobble in scrobbles %}
+      <tr>
+        <td>{{ scrobble.id }}</td>
+        <td>{{ scrobble.time|timesince }}</td>
+        <td>{{ scrobble.artist }} – {{ scrobble.track }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
+<div class="col-md-3"></div>
 {% endblock %}
