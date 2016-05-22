@@ -242,3 +242,27 @@ def milestones():
                  )
 
     return render_template('milestones.html', scrobbles=scrobbles)
+
+
+@blueprint.route("/artist/<name>/")
+def artist(name=None):
+
+    scrobbles = func.count(Scrobble.track).label('count')
+    first_time = func.min(Scrobble.time).label('first_time')
+    query = (db.session
+             .query(scrobbles, Scrobble.track, first_time)
+             .filter(func.lower(Scrobble.artist) == name.lower())
+             .order_by(scrobbles.desc())
+             )
+
+    total_scrobbles, _, first_time_heard = query.first()
+
+    chart = (query.group_by(func.lower(Scrobble.track))
+             .limit(request.args.get('count', app.config['RESULTS_COUNT']))
+             .all()
+             )
+
+    max_count = chart[0][0]
+    chart = enumerate(chart, start=1)
+
+    return render_template('artist.html', chart=chart, total=total_scrobbles, max_count=max_count)
