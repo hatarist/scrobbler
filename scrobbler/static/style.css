@@ -1,11 +1,75 @@
 .navbar-custom {
-	border-radius: 0;
+    border-radius: 0;
 }
 
 .navbar-custom .navbar-brand {
-	color: #dadada;
+    color: #dadada;
 }
 
 h2 {
     padding-bottom: 24px;
 }
+
+.period .dropdown {
+    display: inline;
+}
+
+#yearly_artists {
+    width: 1260px;
+}
+
+.yearly_chart {
+    width: 420px;
+    vertical-align: top;
+}
+
+.yearly_chart th.place {
+    width: 80px
+}
+
+.yearly_chart th.scrobbles {
+    width: 60px
+}
+
+.yearly_chart th.name {
+    width: 280px
+}
+
+.carousel-inner .carousel-control {
+    display: none !important;
+}
+
+.carousel-inner .active .carousel-control {
+    display: inline !important;
+}
+
+.carousel-inner .active.left {
+    left: -33%;
+}
+
+.carousel-inner .next {
+    left: 33%;
+}
+
+.carousel-inner .prev {
+    left: -33%;
+}
+
+.carousel-control.left,
+.carousel-control.right {
+    background-image: none;
+    color: black;
+    top: -8px;
+    line-height: 10px;
+    position: relative;
+}
+
+.carousel-control.left {
+    left: -16px;
+}
+
+.carousel-control.right {
+    left: 12px;
+}
+
+.

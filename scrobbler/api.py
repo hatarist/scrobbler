@@ -18,7 +18,7 @@ def handshake():
     handshake = request.args.get('hs')
 
     if handshake is None:
-        return redirect(url_for('webui.index'))
+        return redirect(url_for('webui.dashboard'))
 
     data = parse_auth_request(request.args)
 

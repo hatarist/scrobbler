@@ -14,14 +14,14 @@
       <ul class="nav navbar-nav">
 
         {% set elements = [
-          (url_for('webui.index'), 'Dashboard'),
+          (url_for('webui.dashboard'), 'Dashboard'),
           (url_for('webui.last_scrobbles'), 'Latest'),
           (url_for('webui.top_artists'), 'Top Charts'),
           (url_for('webui.milestones'), 'Milestones'),
         ] %}
 
         {% for url, name in elements %}
-          <li{% if request.path == url %} class="active"{% endif %}>
+          <li{% if url in request.path %} class="active"{% endif %}>
             <a href="{{ url }}">{{ name }}</a>
           </li>
         {% endfor %}

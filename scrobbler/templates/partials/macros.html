@@ -1,0 +1,16 @@
+{% macro select_period(url_name, period, periods) -%}
+  <div class="period dropdown">
+  <a class="dropdown-toggle" id="select_period" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" href="#">
+    {{ period }}<span class="caret"></span>
+  </a>
+
+  <ul class="dropdown-menu" aria-labelledby="select_period">
+    {% for key, (value, days) in periods %}
+      {% if period == value %}
+        <li class="active"><a href="{{ url_for(url_name, period=key) }}">{{ value }}</a></li>
+      {% else %}
+        <li><a href="{{ url_for(url_name, period=key) }}">{{ value }}</a></li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{%- endmacro %}

@@ -2,7 +2,7 @@
 
 import datetime
 
-from flask import Blueprint, render_template, request
+from flask import Blueprint, redirect, render_template, request, url_for
 from flask import current_app as app
 from sqlalchemy import func
 
@@ -15,7 +15,12 @@ blueprint = Blueprint('webui', __name__)
 
 @blueprint.route("/")
 def index():
-    return render_template('index.html')
+    return redirect(url_for('webui.dashboard'))
+
+
+@blueprint.route("/dashboard/")
+def dashboard():
+    return render_template('dashboard.html')
 
 
 @blueprint.route("/latest/")

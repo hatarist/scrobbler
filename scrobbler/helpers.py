@@ -4,7 +4,7 @@ import hashlib
 from collections import defaultdict
 
 from scrobbler import app, db
-from scrobbler.constants import AUTH_KEY_MAPPING, SCROBBLE_KEY_MAPPING
+from scrobbler.constants import AUTH_KEY_MAPPING, SCROBBLE_KEY_MAPPING, PERIODS
 from scrobbler.models import User
 
 
@@ -104,3 +104,8 @@ def timesince(d, now=None):
         name += 's'
 
     return '%(number)d %(type)s ago' % {'number': count, 'type': name}
+
+
+@app.context_processor
+def periods():
+    return {'periods': PERIODS.items()}

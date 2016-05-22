@@ -1,36 +1,50 @@
 {% extends "base.html" %}
 {% block title %}Top yearly artists{% endblock %}
 {% block content %}
-<table class="table">
-<tr style="vertical-align: top">
-  {% for year, chart in charts %}
-  <td style="border-right: 1px solid;">
-    <h3>{{ year }}</h3>
-    <table style="width: 300px" class="table table-bordered table-striped table-condensed">
-      <tr><th>#</th><th>Scrobbles</th><th>Artist</th></tr>
-      {% for position in chart[:show_count] %}
-        <tr>
-        <td>
-          {{ loop.index }}
-            {% if year in position_changes and position.artist in position_changes[year] %}
-              {% if position_changes[year][position.artist] == 'new' %}
-                <span style="color: #880">new</span>
-              {% elif position_changes[year][position.artist] > 0 %}
-                <span style="color: #080">↑{{ position_changes[year][position.artist] }}</span>
-              {% elif position_changes[year][position.artist] < 0 %}
-                <span style="color: #800">↓{{ position_changes[year][position.artist] }}</span>
-              {% elif position_changes[year][position.artist] == 0 %}
-                <span style="color: #888">↕0︎</span>
-              {% endif %}
-            {% endif %}
-        </td>
-          <td>{{ position.count }}</td>
-          <td>{{ position.artist }}</td>
-        </tr>
+
+  <div class="carousel" data-ride="carousel" data-type="multi" data-interval="0" id="yearly_artists">
+    <div class="carousel-inner">
+      {% for year, chart in charts %}
+        <div class="item{% if loop.revindex == 3 %} active{% endif %}">
+          <div class="col-md-4">
+            <h3><a class="left carousel-control" href="#yearly_artists" data-slide="prev"><i class="glyphicon icon-prev"></i></a>
+            {{ year }}
+            <a class="right carousel-control" href="#yearly_artists" data-slide="next"><i class="glyphicon icon-next"></i></a>
+            </h3>
+            <table class="table table-bordered table-striped table-condensed chart yearly_chart">
+            <tr>
+              <th class="place">#</th>
+              <th class="scrobbles">Scrobbles</th>
+              <th class="name">Artist</th>
+            </tr>
+            {% for position in chart[:show_count] %}
+              <tr>
+              <td>
+                {{ loop.index }}
+                  {% if year in position_changes and position.artist in position_changes[year] %}
+                    {% if position_changes[year][position.artist] == 'new' %}
+                      <span style="color: #880">new</span>
+                    {% elif position_changes[year][position.artist] > 0 %}
+                      <span style="color: #080">↑{{ position_changes[year][position.artist] }}</span>
+                    {% elif position_changes[year][position.artist] < 0 %}
+                      <span style="color: #800">↓{{ position_changes[year][position.artist] }}</span>
+                    {% elif position_changes[year][position.artist] == 0 %}
+                      <span style="color: #888">↕0︎</span>
+                    {% endif %}
+                  {% endif %}
+              </td>
+                <td>{{ position.count }}</td>
+                <td>{{ position.artist }}</td>
+              </tr>
+            {% endfor %}
+            </table>
+
+          </div>
+        </div>
       {% endfor %}
-    </table>
-  </td>
-  {% endfor %}
-</tr>
-</table>
+    </div>
+
+  </div>
+
+
 {% endblock %}
