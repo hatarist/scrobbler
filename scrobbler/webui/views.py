@@ -48,6 +48,7 @@ def dashboard():
 def last_scrobbles():
     scrobbles = (db.session
                  .query(Scrobble.id, Scrobble.artist, Scrobble.track, Scrobble.time)
+                 .filter(Scrobble.user_id == current_user.id)
                  .order_by(Scrobble.time.desc())
                  .limit(request.args.get('count', app.config['RESULTS_COUNT']))
                  .all()
@@ -66,6 +67,7 @@ def top_artists(period=None):
     chart = (db.session
              .query(Scrobble.artist, scrobbles)
              .group_by(func.lower(Scrobble.artist))
+             .filter(Scrobble.user_id == current_user.id)
              .filter(Scrobble.time >= time_from)
              .order_by(scrobbles.desc())
              .limit(request.args.get('count', app.config['RESULTS_COUNT']))
@@ -94,6 +96,7 @@ def top_tracks(period=None):
     chart = (db.session
              .query(Scrobble.artist, Scrobble.track, scrobbles)
              .group_by(func.lower(Scrobble.artist), func.lower(Scrobble.track))
+             .filter(Scrobble.user_id == current_user.id)
              .filter(Scrobble.time >= time_from)
              .order_by(scrobbles.desc())
              .limit(request.args.get('count', app.config['RESULTS_COUNT']))
@@ -127,6 +130,7 @@ def top_tracks_yearly():
         time_to = datetime.datetime(year, 12, 31, 23, 59, 59, 999999)
         charts[year] = (db.session
                         .query(Scrobble.artist, Scrobble.track, scrobbles)
+                        .filter(Scrobble.user_id == current_user.id)
                         .filter(Scrobble.time >= time_from, Scrobble.time <= time_to)
                         .group_by(func.lower(Scrobble.artist), func.lower(Scrobble.track))
                         .order_by(scrobbles.desc())
@@ -184,6 +188,7 @@ def top_artists_yearly():
         time_to = datetime.datetime(year, 12, 31, 23, 59, 59, 999999)
         charts[year] = (db.session
                         .query(Scrobble.artist, scrobbles)
+                        .filter(Scrobble.user_id == current_user.id)
                         .filter(Scrobble.time >= time_from, Scrobble.time <= time_to)
                         .group_by(func.lower(Scrobble.artist))
                         .order_by(scrobbles.desc())
@@ -243,17 +248,20 @@ def unique_yearly():
         time_to = datetime.datetime(year, 12, 31, 23, 59, 59, 999999)
         scrobbles = (db.session
                      .query(Scrobble)
+                     .filter(Scrobble.user_id == current_user.id)
                      .filter(Scrobble.time >= time_from, Scrobble.time <= time_to)
                      .count()
                      )
         unique_artists = (db.session
                           .query(Scrobble.artist)
+                          .filter(Scrobble.user_id == current_user.id)
                           .filter(Scrobble.time >= time_from, Scrobble.time <= time_to)
                           .group_by(func.lower(Scrobble.artist))
                           .count()
                           )
         unique_tracks = (db.session
                          .query(Scrobble.artist, Scrobble.track)
+                         .filter(Scrobble.user_id == current_user.id)
                          .filter(Scrobble.time >= time_from, Scrobble.time <= time_to)
                          .group_by(func.lower(Scrobble.artist), func.lower(Scrobble.track))
                          .count()
@@ -277,6 +285,7 @@ def milestones():
     m_list = range(step, max_id, step)
     scrobbles = (db.session
                  .query(Scrobble)
+                 .filter(Scrobble.user_id == current_user.id)
                  .filter(Scrobble.id.in_(m_list))
                  .order_by(Scrobble.id.desc())
                  )
@@ -295,6 +304,7 @@ def artist(name=None):
     first_time = func.min(Scrobble.time).label('first_time')
     query = (db.session
              .query(scrobbles, Scrobble.track, first_time)
+             .filter(Scrobble.user_id == current_user.id)
              .filter(func.lower(Scrobble.artist) == name.lower())
              .order_by(scrobbles.desc())
              )
@@ -324,9 +334,11 @@ def search():
         abort(404)  # :D
 
     artists = (db.session.query(Scrobble.artist)
+               .filter(Scrobble.user_id == current_user.id)
                .filter(Scrobble.artist.ilike('%{}%'.format(search_query))).distinct()
                .limit(request.args.get('count', app.config['RESULTS_COUNT'])).all())
     tracks = (db.session.query(Scrobble.artist, Scrobble.track)
+              .filter(Scrobble.user_id == current_user.id)
               .filter(Scrobble.track.ilike('%{}%'.format(search_query))).distinct()
               .limit(request.args.get('count', app.config['RESULTS_COUNT'])).all())
 
