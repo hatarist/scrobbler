@@ -2,7 +2,7 @@
 
 import datetime
 
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import abort, Blueprint, redirect, render_template, request, url_for
 from flask import current_app as app
 from sqlalchemy import func
 
@@ -11,6 +11,11 @@ from scrobbler.constants import PERIODS
 from scrobbler.models import Scrobble
 
 blueprint = Blueprint('webui', __name__)
+
+
+@blueprint.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
 
 
 @blueprint.route("/")
@@ -262,7 +267,33 @@ def artist(name=None):
              .all()
              )
 
+    if not chart:
+        abort(404)
+
     max_count = chart[0][0]
     chart = enumerate(chart, start=1)
 
     return render_template('artist.html', chart=chart, total=total_scrobbles, max_count=max_count)
+
+
+@blueprint.route("/search/")
+def search():
+    search_query = request.args.get('q')
+
+    if not search_query:
+        abort(404)  # :D
+
+    artists = (db.session.query(Scrobble.artist)
+               .filter(Scrobble.artist.ilike('%{}%'.format(search_query))).distinct()
+               .limit(request.args.get('count', app.config['RESULTS_COUNT'])).all())
+    tracks = (db.session.query(Scrobble.artist, Scrobble.track)
+              .filter(Scrobble.track.ilike('%{}%'.format(search_query))).distinct()
+              .limit(request.args.get('count', app.config['RESULTS_COUNT'])).all())
+
+    if not artists and not tracks:
+        abort(404)
+
+    artists = enumerate(artists, start=1)
+    tracks = enumerate(tracks, start=1)
+
+    return render_template('search.html', artists=artists, tracks=tracks)

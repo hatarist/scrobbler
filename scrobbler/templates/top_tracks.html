@@ -12,7 +12,7 @@
     {% for place, scrobble in chart %}
       <tr>
         <td class="place">{{ place }}</td>
-        <td class="name">{{ scrobble.artist }} – {{ scrobble.track }}</td>
+        <td class="name"><a href="{{ url_for('webui.artist', name=scrobble.artist) }}">{{ scrobble.artist }}</a> – {{ scrobble.track }}</td>
         <td class="scrobbles">
           <div class="progress">
             <div class="progress-bar" role="progressbar" aria-valuenow="{{ scrobble.count }}" aria-valuemin="0" aria-valuemax="{{ max_count }}" style="width: {{ ((scrobble.count / max_count) * 100)|int }}%;">

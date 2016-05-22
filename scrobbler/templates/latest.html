@@ -11,7 +11,7 @@
     {% for scrobble in scrobbles %}
       <tr>
         <td class="id">{{ scrobble.id }}</td>
-        <td class="name">{{ scrobble.artist }} – {{ scrobble.track }}</td>
+        <td class="name"><a href="{{ url_for('webui.artist', name=scrobble.artist) }}">{{ scrobble.artist }}</a> – {{ scrobble.track }}</td>
         <td class="time"><span title="{{ scrobble.time }}">{{ scrobble.time|timesince }}</span></td>
       </tr>
     {% endfor %}
