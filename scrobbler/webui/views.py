@@ -6,7 +6,7 @@ from flask.ext.login import current_user, login_required, login_user, logout_use
 from sqlalchemy import func
 
 from scrobbler import db
-from scrobbler.models import Scrobble, User
+from scrobbler.models import NowPlaying, Scrobble, User
 from scrobbler.webui.consts import PERIODS
 from scrobbler.webui.forms import (
     LoginForm,
@@ -53,7 +53,14 @@ def last_scrobbles():
                  .limit(request.args.get('count', app.config['RESULTS_COUNT']))
                  .all()
                  )
-    return render_template('latest.html', scrobbles=scrobbles)
+
+    nowplaying = (db.session
+                  .query(NowPlaying.id, NowPlaying.artist, NowPlaying.track, NowPlaying.time)
+                  .filter(NowPlaying.user_id == current_user.id)
+                  .first()
+                  )
+
+    return render_template('latest.html', scrobbles=scrobbles, nowplaying=nowplaying)
 
 
 @blueprint.route("/top/artists/")

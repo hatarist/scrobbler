@@ -47,6 +47,10 @@ h2 .dropdown {
     display: inline;
 }
 
+tr.nowplaying, .nowplaying td {
+    background-color: #fcf8e3;
+}
+
 .chart {
     width: 100%;
 }
