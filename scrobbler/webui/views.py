@@ -29,7 +29,7 @@ def page_not_found(e):
     return render_template('errors/404.html'), 404
 
 
-@blueprint.route("/")
+@blueprint.route("/hello/")
 def index():
     if current_user.is_authenticated:
         return redirect(url_for('webui.dashboard'))

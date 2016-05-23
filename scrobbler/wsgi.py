@@ -5,7 +5,7 @@ from scrobbler.webui.views import blueprint as webui_bp
 # Blueprints
 app.config.from_pyfile('config.py')
 app.register_blueprint(api_bp)
-app.register_blueprint(webui_bp, url_prefix='/webui')
+app.register_blueprint(webui_bp)
 
 # Database
 db.init_app(app)

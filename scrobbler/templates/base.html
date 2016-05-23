@@ -16,6 +16,8 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% block head %}{% endblock %}
 </head>
 
   <body>
@@ -24,8 +26,7 @@
 
     <div class="container container-fluid">
       <h2 class="title">{% block title %}{% endblock %}</h2>
-      {% block content %}
-      {% endblock %}
+      {% block content %}{% endblock %}
     </div>
   </body>
 </html>
