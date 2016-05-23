@@ -74,6 +74,7 @@ def now_playing():
     np = db.session.query(NowPlaying).filter(NowPlaying.user_id == session.user_id)
 
     data.pop('session_id', None)
+    data['time'] = int(time())
 
     if np.first() is None:
         np = NowPlaying(**data)
