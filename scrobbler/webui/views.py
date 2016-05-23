@@ -303,26 +303,41 @@ def artist(name=None):
     scrobbles = func.count(Scrobble.track).label('count')
     first_time = func.min(Scrobble.time).label('first_time')
     query = (db.session
-             .query(scrobbles, Scrobble.track, first_time)
+             .query(scrobbles, first_time, Scrobble.album, Scrobble.track)
              .filter(Scrobble.user_id == current_user.id)
              .filter(func.lower(Scrobble.artist) == name.lower())
              .order_by(scrobbles.desc())
              )
 
-    total_scrobbles, _, first_time_heard = query.first()
+    total_scrobbles, first_time_heard, _, _ = query.first()
 
-    chart = (query.group_by(func.lower(Scrobble.track))
-             .limit(request.args.get('count', app.config['RESULTS_COUNT']))
-             .all()
-             )
+    top_albums = (query.group_by(func.lower(Scrobble.album))
+                  .limit(request.args.get('count', app.config['RESULTS_COUNT']))
+                  .all()
+                  )
 
-    if not chart:
+    top_tracks = (query.group_by(func.lower(Scrobble.track))
+                  .limit(request.args.get('count', app.config['RESULTS_COUNT']))
+                  .all()
+                  )
+
+    if not top_albums and not top_tracks:
         abort(404)
 
-    max_count = chart[0][0]
-    chart = enumerate(chart, start=1)
+    max_album_scrobbles = top_albums[0][0]
+    max_track_scrobbles = top_tracks[0][0]
 
-    return render_template('artist.html', chart=chart, total=total_scrobbles, max_count=max_count)
+    top_albums = enumerate(top_albums, start=1)
+    top_tracks = enumerate(top_tracks, start=1)
+
+    return render_template(
+        'artist.html',
+        total=total_scrobbles,
+        top_albums=top_albums,
+        top_tracks=top_tracks,
+        max_album_scrobbles=max_album_scrobbles,
+        max_track_scrobbles=max_track_scrobbles
+    )
 
 
 @blueprint.route("/search/")
