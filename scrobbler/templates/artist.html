@@ -1,12 +1,25 @@
 {% extends "base.html" %}
 
 {% block title %}
-  {{ request.view_args.name|title }}
+  {{ artist.name or request.view_args.name|title }}
 {% endblock %}
 
 {% block content %}
 <div class="row">
-  <div class="col-md-6">
+  <div class="col-md-7">
+    {% if artist.tags %}
+      {% for tag in artist.tags %}
+        <span class="label label-default">{{ tag }}</span>
+      {% endfor %}
+      <hr>
+    {% endif %}
+
+    {% if artist.bio %}
+      <h4>Biography</h4>
+      {{ artist.bio }}
+      <hr>
+    {% endif %}
+
     <h4>Top tracks</h4>
     <table class="table table-striped table-condensed table-hover chart">
       {# <tr><th class="place">#</th><th class="name">Track</th><th class="scrobbles">Scrobbles</th></tr> #}
@@ -24,9 +37,7 @@
         </tr>
       {% endfor %}
     </table>
-  </div>
 
-  <div class="col-md-6">
     <h4>Top albums</h4>
     <table class="table table-striped table-condensed table-hover chart">
       {# <tr><th class="place">#</th><th class="name">album</th><th class="scrobbles">Scrobbles</th></tr> #}
@@ -44,6 +55,10 @@
         </tr>
       {% endfor %}
     </table>
+  </div>
+
+  <div class="col-md-5">
+    <img src="{{ artist.image_url }}">
   </div>
 </div>
 {% endblock %}

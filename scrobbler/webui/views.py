@@ -6,7 +6,7 @@ from flask.ext.login import current_user, login_required, login_user, logout_use
 from sqlalchemy import func
 
 from scrobbler import db
-from scrobbler.models import NowPlaying, Scrobble, User
+from scrobbler.models import Artist, NowPlaying, Scrobble, User
 from scrobbler.webui.consts import PERIODS
 from scrobbler.webui.forms import (
     LoginForm,
@@ -307,6 +307,10 @@ def milestones():
 @login_required
 def artist(name=None):
 
+    # Meta data
+    artist = db.session.query(Artist).filter(func.lower(Artist.name) == name.lower()).first()
+
+    # Stats
     scrobbles = func.count(Scrobble.track).label('count')
     first_time = func.min(Scrobble.time).label('first_time')
     query = (db.session
@@ -339,6 +343,7 @@ def artist(name=None):
 
     return render_template(
         'artist.html',
+        artist=artist,
         total=total_scrobbles,
         top_albums=top_albums,
         top_tracks=top_tracks,

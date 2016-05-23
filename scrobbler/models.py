@@ -1,7 +1,8 @@
 import datetime
 
-from sqlalchemy.types import TypeDecorator, Integer
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.types import TypeDecorator, Integer
+from sqlalchemy.orm import relationship
 
 from scrobbler import bcrypt, db
 from scrobbler.api.helpers import md5
@@ -135,6 +136,18 @@ class Artist(db.Model):
     image_url = db.Column(db.String(255))
     playcount = db.Column(db.Integer, default=0)
 
+    # tags = relationship("ArtistTag", back_populates="artist")
+
+    @property
+    def tags(self):
+        return (db.session.query(ArtistTag)
+                .filter(ArtistTag.artist_id == self.id)
+                .order_by(ArtistTag.strength.desc())
+                )
+
+    def __str__(self):
+        return self.name
+
 
 class ArtistTag(db.Model):
     __tablename__ = 'artist_tags'
@@ -143,3 +156,8 @@ class ArtistTag(db.Model):
     artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=False)
     tag = db.Column(db.String(255))
     strength = db.Column(db.Integer)
+
+    artist = relationship("Artist")
+
+    def __str__(self):
+        return self.tag
