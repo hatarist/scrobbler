@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {{ tag.name|title or request.view_args.name|title }}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-7">
+    <h4>Top artists</h4>
+    <table class="table table-striped table-condensed table-hover chart">
+      {# <tr><th class="place">#</th><th class="name">Track</th><th class="scrobbles">Strength</th></tr> #}
+      {% for place, (artist, strength) in top_artists %}
+        <tr>
+          <td class="place">{{ place }}</td>
+          <td class="name">{{ artist.name }}</td>
+          <td class="strength">
+            <div class="progress">
+              <div class="progress-bar" role="progressbar" aria-valuenow="{{ artist }}" aria-valuemin="0" aria-valuemax="100" style="min-width: 20%; width: {{ strength }}%;">
+                <span>{{ strength }}</span>
+              </div>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <div class="col-md-5">
+  </div>
+</div>
+{% endblock %}

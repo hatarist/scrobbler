@@ -6,7 +6,7 @@ from flask.ext.login import current_user, login_required, login_user, logout_use
 from sqlalchemy import func
 
 from scrobbler import db
-from scrobbler.models import Artist, NowPlaying, Scrobble, User
+from scrobbler.models import Artist, ArtistTag, NowPlaying, Scrobble, User
 from scrobbler.webui.consts import PERIODS
 from scrobbler.webui.forms import (
     LoginForm,
@@ -349,6 +349,21 @@ def artist(name=None):
         top_tracks=top_tracks,
         max_album_scrobbles=max_album_scrobbles,
         max_track_scrobbles=max_track_scrobbles
+    )
+
+
+@blueprint.route("/tag/<name>/")
+@login_required
+def tag(name=None):
+    # tag = db.session.query(ArtistTag).filter().first()
+    query = db.session.query(ArtistTag).filter(func.lower(ArtistTag.tag) == name.lower()).all()
+    top_artists = [(artist_tag.artist, artist_tag.strength) for artist_tag in query]
+    top_artists = enumerate(top_artists, start=1)
+
+    return render_template(
+        'tag.html',
+        tag=tag,
+        top_artists=top_artists,
     )
 
 

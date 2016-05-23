@@ -9,7 +9,7 @@
   <div class="col-md-7">
     {% if artist.tags %}
       {% for tag in artist.tags %}
-        <span class="label label-default">{{ tag }}</span>
+        <a href="{{ url_for('webui.tag', name=tag) }}"><span class="label label-default">{{ tag }}</span></a>
       {% endfor %}
       <hr>
     {% endif %}
