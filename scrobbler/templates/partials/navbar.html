@@ -24,9 +24,9 @@
             (url_for('webui.last_scrobbles'), True, "Latest")
           ]),
 
-          ("Charts", False, [
-            (url_for('webui.top_artists'), False, "Top Artists"),
-            (url_for('webui.top_tracks'), False, "Top Tracks")
+          ("Charts", True, [
+            (url_for('webui.top_artists'), True, "Top Artists"),
+            (url_for('webui.top_tracks'), True, "Top Tracks")
           ]),
 
           ("Milestones", True, [
@@ -62,14 +62,16 @@
           {% endif %}
         {% endfor %}
 
-        <li>
-          <form class="navbar-form" role="search" action="{{ url_for('webui.search') }}" method="get">
-            <div class="form-group">
-              <input type="text" class="form-control" placeholder="Search" name="q">
-            </div>
-            <button type="submit" class="btn btn-default">Submit</button>
-          </form>
-        </li>
+        {% if current_user.is_authenticated %}
+          <li>
+            <form class="navbar-form" role="search" action="{{ url_for('webui.search') }}" method="get">
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Search" name="q">
+              </div>
+              <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+          </li>
+        {% endif %}
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
