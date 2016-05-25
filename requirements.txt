@@ -1,7 +1,9 @@
 Flask==0.10.1
 Flask-Bcrypt==0.7.1
 Flask-Login==0.3.2
-Flask-Script==2.0.5
 Flask-SQLAlchemy==2.1
 Flask-WTF==0.12
 SQLAlchemy==1.0.12
+
+# Install the latest Flask-Script from GitHub; the PyPI one does not support ipython 3+ :O
+-e git+git://github.com/smurfix/flask-script.git#egg=Flask-Script

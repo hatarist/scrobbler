@@ -1,4 +1,4 @@
-from flask.ext.script import Manager, Shell
+from flask.ext.script import Manager
 
 from scrobbler.wsgi import app, db
 
@@ -6,6 +6,7 @@ from scrobbler.wsgi import app, db
 manager = Manager(app)
 
 
+@manager.shell
 def make_shell_context():
     from pprint import pprint
 
@@ -20,7 +21,10 @@ def make_shell_context():
         ArtistTag=ArtistTag,
     )
 
-manager.add_command('shell', Shell(make_context=make_shell_context))
+
+@manager.command
+def initdb():
+    db.create_all()
 
 
 if __name__ == "__main__":
