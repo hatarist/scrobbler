@@ -287,7 +287,11 @@ def unique_yearly():
 @blueprint.route("/milestones/")
 @login_required
 def milestones():
-    step = request.args.get('step', 10000)
+    try:
+        step = int(request.args.get('step'))
+    except (TypeError, ValueError):
+        step = 10000
+
     max_id = db.session.query(func.max(Scrobble.id).label('max_id')).first().max_id
     m_list = range(step, max_id, step)
     scrobbles = (db.session
