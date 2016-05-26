@@ -1,4 +1,4 @@
-from time import time
+import datetime
 
 from flask import Blueprint, redirect, request, url_for
 
@@ -32,10 +32,10 @@ def handshake():
     if session:
         session_id = session.session_id
     else:
-        current_time = str(int(time()))
-        session_id = md5(user.username + user.api_password + current_time)
+        current_time = datetime.datetime.now()
+        session_id = md5(user.username + user.api_password + current_time.strftimek('%s'))
 
-        session = Session(user_id=user.id, session_id=session_id, session_time=current_time)
+        session = Session(user_id=user.id, session_id=session_id, created_at=current_time)
         db.session.add(session)
         db.session.commit()
 
@@ -74,7 +74,7 @@ def now_playing():
     np = db.session.query(NowPlaying).filter(NowPlaying.user_id == session.user_id)
 
     data.pop('session_id', None)
-    data['time'] = int(time())
+    data['played_at'] = datetime.datetime.now()
 
     if np.first() is None:
         np = NowPlaying(**data)
@@ -96,7 +96,11 @@ def scrobble():
     session = db.session.query(Session).filter(Session.session_id == session_id).first()
 
     for data in scrobbles:
-        scrobble = Scrobble(user_id=session.user_id, **data)
+        scrobble = Scrobble(
+            user_id=session.user_id,
+            played_at=data.pop('timestamp'),
+            **data
+        )
         db.session.add(scrobble)
 
     db.session.commit()

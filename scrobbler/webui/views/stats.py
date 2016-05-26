@@ -17,15 +17,15 @@ def last_scrobbles():
     count = get_argument('count', default=app.config['RESULTS_COUNT'])
 
     scrobbles = (db.session
-                 .query(Scrobble.id, Scrobble.artist, Scrobble.track, Scrobble.time)
+                 .query(Scrobble.id, Scrobble.artist, Scrobble.track, Scrobble.played_at)
                  .filter(Scrobble.user_id == current_user.id)
-                 .order_by(Scrobble.time.desc())
+                 .order_by(Scrobble.played_at.desc())
                  .limit(count)
                  .all()
                  )
 
     nowplaying = (db.session
-                  .query(NowPlaying.id, NowPlaying.artist, NowPlaying.track, NowPlaying.time)
+                  .query(NowPlaying.id, NowPlaying.artist, NowPlaying.track, NowPlaying.played_at)
                   .filter(NowPlaying.user_id == current_user.id)
                   .first()
                   )
@@ -49,21 +49,21 @@ def unique_monthly():
             scrobbles = (db.session
                          .query(Scrobble)
                          .filter(Scrobble.user_id == current_user.id)
-                         .filter(Scrobble.time >= time_from, Scrobble.time <= time_to)
+                         .filter(Scrobble.played_at >= time_from, Scrobble.played_at <= time_to)
                          .count()
                          )
             unique_artists = (db.session
                               .query(Scrobble.artist)
                               .filter(Scrobble.user_id == current_user.id)
-                              .filter(Scrobble.time >= time_from, Scrobble.time <= time_to)
-                              .group_by(func.lower(Scrobble.artist))
+                              .filter(Scrobble.played_at >= time_from, Scrobble.played_at <= time_to)
+                              .group_by(Scrobble.artist)
                               .count()
                               )
             unique_tracks = (db.session
                              .query(Scrobble.artist, Scrobble.track)
                              .filter(Scrobble.user_id == current_user.id)
-                             .filter(Scrobble.time >= time_from, Scrobble.time <= time_to)
-                             .group_by(func.lower(Scrobble.artist), func.lower(Scrobble.track))
+                             .filter(Scrobble.played_at >= time_from, Scrobble.played_at <= time_to)
+                             .group_by(Scrobble.artist, Scrobble.track)
                              .count()
                              )
 
@@ -92,21 +92,21 @@ def unique_yearly():
         scrobbles = (db.session
                      .query(Scrobble)
                      .filter(Scrobble.user_id == current_user.id)
-                     .filter(Scrobble.time >= time_from, Scrobble.time <= time_to)
+                     .filter(Scrobble.played_at >= time_from, Scrobble.played_at <= time_to)
                      .count()
                      )
         unique_artists = (db.session
                           .query(Scrobble.artist)
                           .filter(Scrobble.user_id == current_user.id)
-                          .filter(Scrobble.time >= time_from, Scrobble.time <= time_to)
-                          .group_by(func.lower(Scrobble.artist))
+                          .filter(Scrobble.played_at >= time_from, Scrobble.played_at <= time_to)
+                          .group_by(Scrobble.artist)
                           .count()
                           )
         unique_tracks = (db.session
                          .query(Scrobble.artist, Scrobble.track)
                          .filter(Scrobble.user_id == current_user.id)
-                         .filter(Scrobble.time >= time_from, Scrobble.time <= time_to)
-                         .group_by(func.lower(Scrobble.artist), func.lower(Scrobble.track))
+                         .filter(Scrobble.played_at >= time_from, Scrobble.played_at <= time_to)
+                         .group_by(Scrobble.artist, Scrobble.track)
                          .count()
                          )
 

@@ -8,7 +8,7 @@ SECRET_KEY = 'ChangeMe'
 BCRYPT_LOG_ROUNDS = 12
 
 # Flask-SQLAlchemy
-SQLALCHEMY_DATABASE_URI = 'sqlite:///../db/scrobbler.sqlite3'
+SQLALCHEMY_DATABASE_URI = 'postgresql://scrobbler:scrobbler@localhost:5432/scrobbler'
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 # Scrobbler

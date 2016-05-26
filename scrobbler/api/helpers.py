@@ -1,3 +1,4 @@
+import datetime
 import hashlib
 
 from collections import defaultdict
@@ -59,10 +60,12 @@ def parse_scrobble_request(args):
         if k_readable_name in ('timestamp', 'length'):
             value = int(value)
 
+        if k_readable_name == 'timestamp':
+            value = datetime.datetime.fromtimestamp(value)
+
         scrobbles[k_index][k_readable_name] = value
 
     # Convert dict to list & sort by timestamps
     scrobbles = sorted(scrobbles.values(), key=lambda d: d.get('i', 0))
 
     return (session_id, scrobbles)
-

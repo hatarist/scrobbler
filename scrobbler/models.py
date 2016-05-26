@@ -1,34 +1,11 @@
 import datetime
 
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.types import TypeDecorator, Integer
 from sqlalchemy.orm import relationship
 
 from scrobbler import bcrypt, db
 from scrobbler.api.helpers import md5
-
-
-class IntegerDateTime(TypeDecorator):
-    """ A type that decorates DateTime, converts to unix time on
-    the way in and to datetime.datetime objects on the way out. """
-
-    impl = Integer  # In schema, you want these datetimes to be stored as integers.
-
-    def process_bind_param(self, value, _):
-        """ Assumes a datetime.datetime """
-        if value is None:
-            return None
-        elif isinstance(value, int):
-            return value
-        elif isinstance(value, datetime.datetime):
-            return int(value.strftime('%s'))
-
-        raise ValueError("Can operate only on integer/datetime values. "
-                         "Offending value type: {0}".format(type(value).__name__))
-
-    def process_result_value(self, value, _):
-        if value is not None:  # support nullability
-            return datetime.datetime.fromtimestamp(float(value))
 
 
 class User(db.Model):
@@ -40,7 +17,7 @@ class User(db.Model):
     _api_password = db.Column('api_password', db.String(32))
     _webui_password = db.Column('webui_password', db.String(128))
     is_active = db.Column(db.Boolean, default=True, nullable=False)
-    created_at = db.Column(IntegerDateTime, nullable=False, default=datetime.datetime.now)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.datetime.utcnow)
     settings = db.Column(db.String(255))
 
     sessions = db.relationship('Session', backref='user')
@@ -88,11 +65,17 @@ class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     session_id = db.Column(db.String(32))
-    session_time = db.Column(IntegerDateTime)
+    created_at = db.Column(db.DateTime(timezone=True))
 
 
 class BaseScrobble():
-    time = db.Column(IntegerDateTime, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+
+    @declared_attr
+    def user_id(cls):
+        return db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    played_at = db.Column(db.DateTime(timezone=True), nullable=False)
 
     # Track metadata
     artist = db.Column(db.String(255), nullable=False)
@@ -104,27 +87,16 @@ class BaseScrobble():
     # Optional information
     musicbrainz = db.Column(db.String(255))
 
-    def __init__(self, **kwargs):
-        self.time = kwargs.pop('timestamp', kwargs.pop('time', None))
-        super(BaseScrobble, self).__init__(**kwargs)
 
-
-class Scrobble(BaseScrobble, db.Model):
+class Scrobble(db.Model, BaseScrobble):
     __tablename__ = 'scrobbles'
 
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-
-    # Optional information
     source = db.Column(db.String(255))
     rating = db.Column(db.String(255))
 
 
-class NowPlaying(BaseScrobble, db.Model):
+class NowPlaying(db.Model, BaseScrobble):
     __tablename__ = 'np'
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, unique=True)
 
 
 class Artist(db.Model):

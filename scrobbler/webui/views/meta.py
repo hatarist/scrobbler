@@ -26,7 +26,7 @@ def artist(name=None):
 
     # Stats
     scrobbles = func.count(Scrobble.track).label('count')
-    first_time = func.min(Scrobble.time).label('first_time')
+    first_time = func.min(Scrobble.played_at).label('first_time')
     query = (db.session
              .query(scrobbles, first_time, Scrobble.album, Scrobble.track)
              .filter(Scrobble.user_id == current_user.id)
@@ -36,8 +36,8 @@ def artist(name=None):
 
     total_scrobbles, first_time_heard, _, _ = query.first()
 
-    top_albums = query.group_by(func.lower(Scrobble.album)).limit(count).all()
-    top_tracks = query.group_by(func.lower(Scrobble.track)).limit(count).all()
+    top_albums = query.group_by(Scrobble.album).limit(count).all()
+    top_tracks = query.group_by(Scrobble.track).limit(count).all()
 
     if not top_albums and not top_tracks:
         abort(404)
@@ -62,8 +62,16 @@ def artist(name=None):
 @blueprint.route("/tag/<name>/")
 @login_required
 def tag(name=None):
-    # tag = db.session.query(ArtistTag).filter().first()
-    query = db.session.query(ArtistTag).filter(func.lower(ArtistTag.tag) == name.lower()).all()
+    scrobbles = func.count(Scrobble.artist).label('count')
+
+    query = (db.session
+             .query(ArtistTag)
+             .filter(func.lower(ArtistTag.tag) == name.lower())
+             .filter(Scrobble.artist == ArtistTag.artist.name)
+             .order_by(scrobbles.desc())
+             .all()
+             )
+
     top_artists = [(artist_tag.artist, artist_tag.strength) for artist_tag in query]
     top_artists = enumerate(top_artists, start=1)
 

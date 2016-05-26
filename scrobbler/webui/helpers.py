@@ -8,7 +8,7 @@ from scrobbler.models import User
 
 
 @app.template_filter('timesince')
-def timesince(d, now=None):
+def timesince(time, now=None):
     chunks = (
         (60 * 60 * 24 * 365, 'year'),
         (60 * 60 * 24 * 30, 'month'),
@@ -19,15 +19,10 @@ def timesince(d, now=None):
         (1, 'second')
     )
 
-    if not isinstance(d, datetime.datetime):
-        d = datetime.datetime.fromtimestamp(d)
-    if now and not isinstance(now, datetime.datetime):
-        now = datetime.datetime.fromtimestamp(now)
-
     if not now:
-        now = datetime.datetime.now()
+        now = datetime.datetime.now().replace(tzinfo=time.tzinfo)
 
-    delta = now - (d - datetime.timedelta(0, 0, d.microsecond))
+    delta = now - (time - datetime.timedelta(0, 0, time.microsecond))
     since = delta.days * 24 * 60 * 60 + delta.seconds
     if since <= 0:
         return 'in the future'
