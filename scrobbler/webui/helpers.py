@@ -1,6 +1,6 @@
 import datetime
 
-from flask import flash
+from flask import flash, request
 
 from scrobbler import app, db, login_manager
 from scrobbler.webui.consts import PERIODS
@@ -56,3 +56,12 @@ def show_form_errors(form):
     for field, errors in form.errors.items():
         for error in errors:
             flash(u"<b>{}</b>: {}".format(getattr(form, field).label.text, error), 'error')
+
+
+def get_argument(arg_name, arg_type=None, default=0):
+    arg_type = arg_type or int
+
+    try:
+        return arg_type(request.args.get(arg_name))
+    except (TypeError, ValueError):
+        return default

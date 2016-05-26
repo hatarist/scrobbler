@@ -5,7 +5,7 @@ from flask import current_app as app
 from flask.ext.login import current_user, login_required, login_user, logout_user
 from sqlalchemy import func
 
-from scrobbler import db
+from scrobbler import db, meta
 from scrobbler.models import Artist, ArtistTag, NowPlaying, Scrobble, User
 from scrobbler.webui.consts import PERIODS
 from scrobbler.webui.forms import (
@@ -14,7 +14,7 @@ from scrobbler.webui.forms import (
     ChangeAPIPasswordForm,
     ChangeWebUIPasswordForm,
 )
-from scrobbler.webui.helpers import show_form_errors
+from scrobbler.webui.helpers import show_form_errors, get_argument
 
 blueprint = Blueprint('webui', __name__)
 
@@ -46,11 +46,13 @@ def dashboard():
 @blueprint.route("/latest/")
 @login_required
 def last_scrobbles():
+    count = get_argument('count', default=app.config['RESULTS_COUNT'])
+
     scrobbles = (db.session
                  .query(Scrobble.id, Scrobble.artist, Scrobble.track, Scrobble.time)
                  .filter(Scrobble.user_id == current_user.id)
                  .order_by(Scrobble.time.desc())
-                 .limit(request.args.get('count', app.config['RESULTS_COUNT']))
+                 .limit(count)
                  .all()
                  )
 
@@ -68,6 +70,7 @@ def last_scrobbles():
 @login_required
 def top_artists(period=None):
     period, days = PERIODS.get(period, PERIODS['1w'])
+    count = get_argument('count', default=app.config['RESULTS_COUNT'])
 
     scrobbles = func.count(Scrobble.artist).label('count')
     time_from = datetime.datetime.now() - datetime.timedelta(days=days)
@@ -77,7 +80,7 @@ def top_artists(period=None):
              .filter(Scrobble.user_id == current_user.id)
              .filter(Scrobble.time >= time_from)
              .order_by(scrobbles.desc())
-             .limit(request.args.get('count', app.config['RESULTS_COUNT']))
+             .limit(count)
              .all()
              )
 
@@ -97,6 +100,7 @@ def top_artists(period=None):
 @login_required
 def top_tracks(period=None):
     period, days = PERIODS.get(period, PERIODS['1w'])
+    count = get_argument('count', default=app.config['RESULTS_COUNT'])
 
     scrobbles = func.count(Scrobble.artist).label('count')
     time_from = datetime.datetime.now() - datetime.timedelta(days=days)
@@ -106,7 +110,7 @@ def top_tracks(period=None):
              .filter(Scrobble.user_id == current_user.id)
              .filter(Scrobble.time >= time_from)
              .order_by(scrobbles.desc())
-             .limit(request.args.get('count', app.config['RESULTS_COUNT']))
+             .limit(count)
              .all()
              )
 
@@ -287,10 +291,7 @@ def unique_yearly():
 @blueprint.route("/milestones/")
 @login_required
 def milestones():
-    try:
-        step = int(request.args.get('step'))
-    except (TypeError, ValueError):
-        step = 10000
+    step = get_argument('step', default=10000)
 
     max_id = db.session.query(func.max(Scrobble.id).label('max_id')).first().max_id
     m_list = range(step, max_id, step)
@@ -310,6 +311,12 @@ def milestones():
 @blueprint.route("/artist/<name>/")
 @login_required
 def artist(name=None):
+    sync_meta = get_argument('sync_meta')
+    count = get_argument('count', default=app.config['RESULTS_COUNT'])
+
+    if sync_meta:
+        meta.artist.sync(name, sync_meta)
+        return redirect(url_for('webui.artist', name=name))
 
     # Meta data
     artist = db.session.query(Artist).filter(func.lower(Artist.name) == name.lower()).first()
@@ -326,15 +333,8 @@ def artist(name=None):
 
     total_scrobbles, first_time_heard, _, _ = query.first()
 
-    top_albums = (query.group_by(func.lower(Scrobble.album))
-                  .limit(request.args.get('count', app.config['RESULTS_COUNT']))
-                  .all()
-                  )
-
-    top_tracks = (query.group_by(func.lower(Scrobble.track))
-                  .limit(request.args.get('count', app.config['RESULTS_COUNT']))
-                  .all()
-                  )
+    top_albums = query.group_by(func.lower(Scrobble.album)).limit(count).all()
+    top_tracks = query.group_by(func.lower(Scrobble.track)).limit(count).all()
 
     if not top_albums and not top_tracks:
         abort(404)
@@ -375,6 +375,7 @@ def tag(name=None):
 @login_required
 def search():
     search_query = request.args.get('q')
+    count = get_argument('count', default=app.config['RESULTS_COUNT'])
 
     if not search_query:
         abort(404)  # :D
@@ -382,11 +383,11 @@ def search():
     artists = (db.session.query(Scrobble.artist)
                .filter(Scrobble.user_id == current_user.id)
                .filter(Scrobble.artist.ilike('%{}%'.format(search_query))).distinct()
-               .limit(request.args.get('count', app.config['RESULTS_COUNT'])).all())
+               .limit(count).all())
     tracks = (db.session.query(Scrobble.artist, Scrobble.track)
               .filter(Scrobble.user_id == current_user.id)
               .filter(Scrobble.track.ilike('%{}%'.format(search_query))).distinct()
-              .limit(request.args.get('count', app.config['RESULTS_COUNT'])).all())
+              .limit(count).all())
 
     if not artists and not tracks:
         abort(404)

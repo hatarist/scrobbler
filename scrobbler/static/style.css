@@ -184,3 +184,8 @@ tr.nowplaying,
     box-shadow: none;
     border-color: #cccccc;
 }
+
+.artist_image {
+    max-height: 400px;
+    max-width: 400px;
+}
