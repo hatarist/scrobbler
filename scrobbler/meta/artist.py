@@ -26,7 +26,11 @@ def sync(name, method=SYNC_META.INSERT_OR_UPDATE):
         db.session.commit()
 
         for tag_name, tag_weight in data['tags']:
-            tag = ArtistTag(artist_id=artist.id, tag=tag_name, strength=tag_weight)
+            tag = db.session.query(ArtistTag).filter(artist_id=artist.id, tag=tag_name).first()
+
+            if tag is None:
+                tag = ArtistTag(artist_id=artist.id, tag=tag_name, strength=tag_weight)
+
             db.session.add(tag)
 
         db.session.commit()
@@ -42,7 +46,11 @@ def sync(name, method=SYNC_META.INSERT_OR_UPDATE):
         db.session.query(ArtistTag).filter(ArtistTag.artist_id == artist.id).delete()
 
         for tag_name, tag_weight in data['tags']:
-            tag = ArtistTag(artist_id=artist.id, tag=tag_name, strength=tag_weight)
+            tag = db.session.query(ArtistTag).filter(artist_id=artist.id, tag=tag_name).first()
+
+            if tag is None:
+                tag = ArtistTag(artist_id=artist.id, tag=tag_name, strength=tag_weight)
+
             db.session.add(tag)
 
         db.session.commit()

@@ -13,7 +13,7 @@
       {% for place, (artist, strength) in top_artists %}
         <tr>
           <td class="place">{{ place }}</td>
-          <td class="name">{{ artist.name }}</td>
+          <td class="name"><a href="{{ url_for('webui.artist', name=artist.name) }}">{{ artist.name }}</a></td>
           <td class="strength">
             <div class="progress">
               <div class="progress-bar" role="progressbar" aria-valuenow="{{ artist }}" aria-valuemin="0" aria-valuemax="100" style="min-width: 20%; width: {{ strength }}%;">
