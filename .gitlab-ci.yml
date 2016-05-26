@@ -1,0 +1,3 @@
+deploy:
+  script:
+    - sudo ${DEPLOY_SCRIPT_PATH}
