@@ -49,7 +49,7 @@ def artist(name=None):
     top_tracks = enumerate(top_tracks, start=1)
 
     return render_template(
-        'artist.html',
+        'meta/artist.html',
         artist=artist,
         total=total_scrobbles,
         top_albums=top_albums,
@@ -68,7 +68,7 @@ def tag(name=None):
     top_artists = enumerate(top_artists, start=1)
 
     return render_template(
-        'tag.html',
+        'meta/tag.html',
         tag=tag,
         top_artists=top_artists,
     )

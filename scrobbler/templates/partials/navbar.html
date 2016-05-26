@@ -30,13 +30,14 @@
             ('---'),
             (url_for('webui.top_yearly_artists'), True, "Top Yearly Artists"),
             (url_for('webui.top_yearly_tracks'), True, "Top Yearly Tracks"),
-            ('---'),
-            (url_for('webui.unique_yearly'), True, "Unique Yearly"),
           ]),
 
-          ("Milestones", True, [
-            (url_for('webui.milestones'), True, "Milestones")
-          ])
+          ("Stats", True, [
+            (url_for('webui.milestones'), True, "Milestones"),
+            ('---'),
+            (url_for('webui.unique_yearly'), True, "Unique Yearly"),
+            (url_for('webui.unique_monthly'), True, "Unique Monthly"),
+          ]),
 
         ] %}
 
