@@ -1,4 +1,4 @@
-from flask import abort, redirect, render_template, request, url_for
+from flask import abort, flash, redirect, render_template, request, url_for
 from flask.ext.login import current_user, login_required
 from sqlalchemy import func
 
@@ -15,7 +15,10 @@ def artist(name=None):
     count = get_argument('count', default=app.config['RESULTS_COUNT'])
 
     if sync_meta:
-        meta.artist.sync(name, sync_meta)
+        result = meta.artist.sync(name, sync_meta)
+        if not result:
+            flash("Couldn't retrieve information from Last.fm :(", category='error')
+
         return redirect(url_for('webui.artist', name=name))
 
     # Meta data

@@ -1,1 +1,1 @@
-from . import artist
+from scrobbler.meta import artist

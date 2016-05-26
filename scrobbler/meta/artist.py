@@ -10,9 +10,12 @@ def sync(name, method=SYNC_META.INSERT_OR_UPDATE):
               .filter(func.lower(Artist.name) == name.lower())
               .first())
 
-    if artist is None and SYNC_META(method) in (SYNC_META.INSERT_ONLY, SYNC_META.INSERT_OR_UPDATE):
-        data = lastfm.artist(name)
+    data = lastfm.artist(name)
 
+    if not data:
+        return False
+
+    if artist is None and SYNC_META(method) in (SYNC_META.INSERT_ONLY, SYNC_META.INSERT_OR_UPDATE):
         artist = Artist(
             name=data['name'],
             bio=data['bio'],
@@ -29,8 +32,6 @@ def sync(name, method=SYNC_META.INSERT_OR_UPDATE):
         db.session.commit()
 
     elif artist is not None and method == SYNC_META.INSERT_OR_UPDATE:
-        data = lastfm.artist(name)
-
         artist.name = data['name']
         artist.bio = data['bio']
         artist.image_url = data['image']
@@ -45,3 +46,5 @@ def sync(name, method=SYNC_META.INSERT_OR_UPDATE):
             db.session.add(tag)
 
         db.session.commit()
+
+    return data

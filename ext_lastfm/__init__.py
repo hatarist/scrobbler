@@ -31,17 +31,14 @@ class LastFM(pylast.LastFMNetwork):
             )
 
             self._connected = True
-            print('connected!')
         except pylast.MalformedResponseError:
             logger.warning("[Flask.ext.LastFM] Got a malformed response. Please check "
                            "that you are not overriding Last.FM servers in /etc/hosts")
 
     def artist(self, artist_name, tags=20, bio=True, image=True, playcount=True):
         if not self._connected:
-            print('not connected, connecting...')
             self._connect()
 
-        print('getting artist info...')
         """Retrieves artist metadata with additional stuff (bio, image, tags etc.)"""
         data = {'name': None, 'tags': [], 'bio': None, 'image': None, 'playcount': None}
 
@@ -63,8 +60,10 @@ class LastFM(pylast.LastFMNetwork):
             if playcount:
                 data['playcount'] = artist_info.get_playcount()
 
-        except:
+        except Exception:
             self._connected = False
-            logger.warning('Something went wrong! :( Connection was reset for the good.')
+            logger.error(
+                'Something went wrong! :( Connection was reset for the good.', exc_info=True)
+            return False
 
         return data
