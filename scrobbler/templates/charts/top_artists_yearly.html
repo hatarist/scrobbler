@@ -38,7 +38,7 @@
                     <span class="label label-warning">new</span>
                   {% endif %}
               </td>
-                <td class="name"><a href="{{ url_for('webui.artist', name=scrobble.artist) }}">{{ position.artist }}</a></td>
+                <td class="name"><a href="{{ url_for('webui.artist', name=position.artist) }}">{{ position.artist }}</a></td>
                 <td class="scrobbles">{{ position.count }}</td>
               </tr>
             {% endfor %}
