@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Unique stats{% endblock %}
+{% block content %}
+<div class="col-md-3"></div>
+<div class="col-md-6">
+  <table class="table table-bordered table-striped table-condensed">
+    <tr><th>Date</th><th>Total scrobbles</th><th>Unique artists</th><th>Unique tracks</th></tr>
+    {% for date, (scrobbles, artists, tracks) in stats %}
+      <tr><td>{{ date }}</td><td>{{ scrobbles }}</td><td>{{ artists }}</td><td>{{ tracks }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+<div class="col-md-3"></div>
+{% endblock %}

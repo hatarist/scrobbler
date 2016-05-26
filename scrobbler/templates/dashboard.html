@@ -1,11 +1,3 @@
 {% extends "base.html" %}
 {% block content %}
-<ul>
-  <li><a href="{{ url_for('webui.last_scrobbles') }}">Last scrobbles</a></li>
-  <li><a href="{{ url_for('webui.top_artists') }}">Top artists</a></li>
-  <li><a href="{{ url_for('webui.top_artists_yearly') }}">Top artists (yearly)</a></li>
-  <li><a href="{{ url_for('webui.top_tracks') }}">Top tracks</a></li>
-  <li><a href="{{ url_for('webui.top_tracks_yearly') }}">Top tracks (yearly)</a></li>
-  <li><a href="{{ url_for('webui.unique_yearly') }}">Unique stats (yearly)</a></li>
-</ul>
 {% endblock %}

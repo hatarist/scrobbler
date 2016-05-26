@@ -1,3 +1,4 @@
+import calendar
 import datetime
 
 from flask import render_template
@@ -32,6 +33,51 @@ def last_scrobbles():
     return render_template('latest.html', scrobbles=scrobbles, nowplaying=nowplaying)
 
 
+@blueprint.route("/unique/monthly/")
+@login_required
+def unique_monthly():
+    stats = {}
+
+    year_from = 2006
+    year_to = 2016
+
+    for year in range(year_from, year_to + 1):
+        for month in range(1, 13):
+            time_from = datetime.datetime(year, month, 1)
+            time_to = time_from + datetime.timedelta(days=calendar.monthrange(year, month)[1])
+
+            scrobbles = (db.session
+                         .query(Scrobble)
+                         .filter(Scrobble.user_id == current_user.id)
+                         .filter(Scrobble.time >= time_from, Scrobble.time <= time_to)
+                         .count()
+                         )
+            unique_artists = (db.session
+                              .query(Scrobble.artist)
+                              .filter(Scrobble.user_id == current_user.id)
+                              .filter(Scrobble.time >= time_from, Scrobble.time <= time_to)
+                              .group_by(func.lower(Scrobble.artist))
+                              .count()
+                              )
+            unique_tracks = (db.session
+                             .query(Scrobble.artist, Scrobble.track)
+                             .filter(Scrobble.user_id == current_user.id)
+                             .filter(Scrobble.time >= time_from, Scrobble.time <= time_to)
+                             .group_by(func.lower(Scrobble.artist), func.lower(Scrobble.track))
+                             .count()
+                             )
+
+            key = '{:d}-{:02d}'.format(year, month)
+            stats[key] = (scrobbles, unique_artists, unique_tracks)
+
+    stats = sorted(stats.items())
+
+    return render_template(
+        'stats/unique.html',
+        stats=stats
+    )
+
+
 @blueprint.route("/unique/yearly/")
 @login_required
 def unique_yearly():
@@ -39,15 +85,6 @@ def unique_yearly():
 
     year_from = 2006
     year_to = 2016
-
-    """
-    for year in range(year_from, year_to + 1):
-        for month in range(1, 13):
-            time_from = datetime.datetime(year, month, 1)
-            time_to = time_from + datetime.timedelta(days=calendar.monthrange(year, month)[1])
-            ...
-            stats[str(year) + '-' + str(month)] = (unique_artists, unique_tracks)
-    """
 
     for year in range(year_from, year_to + 1):
         time_from = datetime.datetime(year, 1, 1)
@@ -75,10 +112,10 @@ def unique_yearly():
 
         stats[year] = (scrobbles, unique_artists, unique_tracks)
 
-    stats = stats.items()
+    stats = sorted(stats.items())
 
     return render_template(
-        'unique_yearly.html',
+        'stats/unique.html',
         stats=stats
     )
 
@@ -98,6 +135,6 @@ def milestones():
                  )
 
     return render_template(
-        'milestones.html',
+        'stats/milestones.html',
         scrobbles=scrobbles
     )

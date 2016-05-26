@@ -71,9 +71,9 @@ def top_tracks(period=None):
     )
 
 
-@blueprint.route("/top/tracks/yearly/")
+@blueprint.route("/top/yearly/tracks/")
 @login_required
-def top_tracks_yearly():
+def top_yearly_tracks():
     scrobbles = func.count(Scrobble.artist).label('count')
     charts = {}
 
@@ -122,16 +122,16 @@ def top_tracks_yearly():
     charts = sorted(charts.items())
 
     return render_template(
-        'charts/top_tracks_yearly.html',
+        'charts/top_yearly_tracks.html',
         charts=charts,
         position_changes=position_changes,
         show_count=show_count
     )
 
 
-@blueprint.route("/top/artists/yearly/")
+@blueprint.route("/top/yearly/artists/")
 @login_required
-def top_artists_yearly():
+def top_yearly_artists():
     scrobbles = func.count(Scrobble.artist).label('count')
     charts = {}
 
@@ -176,7 +176,7 @@ def top_artists_yearly():
     charts = sorted(charts.items())
 
     return render_template(
-        'charts/top_artists_yearly.html',
+        'charts/top_yearly_artists.html',
         charts=charts,
         position_changes=position_changes,
         show_count=show_count

@@ -26,7 +26,12 @@
 
           ("Charts", True, [
             (url_for('webui.top_artists'), True, "Top Artists"),
-            (url_for('webui.top_tracks'), True, "Top Tracks")
+            (url_for('webui.top_tracks'), True, "Top Tracks"),
+            ('---'),
+            (url_for('webui.top_yearly_artists'), True, "Top Yearly Artists"),
+            (url_for('webui.top_yearly_tracks'), True, "Top Yearly Tracks"),
+            ('---'),
+            (url_for('webui.unique_yearly'), True, "Unique Yearly"),
           ]),
 
           ("Milestones", True, [
@@ -44,10 +49,14 @@
                 </a>
                 <ul class="dropdown-menu">
                   {% for url, sub_login_required, sub_name in urls %}
-                    {% if not sub_login_required or (sub_login_required and current_user.is_authenticated) %}
-                      <li{% if url in request.path %} class="active"{% endif %}>
-                        <a href="{{ url }}">{{ sub_name }}</a>
-                      </li>
+                    {% if url == '-' %}
+                      <li role="separator" class="divider"></li>
+                    {% else %}
+                      {% if not sub_login_required or (sub_login_required and current_user.is_authenticated) %}
+                        <li{% if url in request.path %} class="active"{% endif %}>
+                          <a href="{{ url }}">{{ sub_name }}</a>
+                        </li>
+                      {% endif %}
                     {% endif %}
                   {% endfor %}
                 </ul>

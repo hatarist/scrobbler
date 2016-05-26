@@ -91,7 +91,7 @@ def settings():
         show_form_errors(form_webui_pass)
 
     return render_template(
-        'settings.html',
+        'auth/settings.html',
         form_api_pass=form_api_pass,
         form_webui_pass=form_webui_pass,
     )
