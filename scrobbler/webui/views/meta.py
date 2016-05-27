@@ -27,17 +27,31 @@ def artist(name=None):
     # Stats
     scrobbles = func.count(Scrobble.track).label('count')
     first_time = func.min(Scrobble.played_at).label('first_time')
-    query = (db.session
-             .query(scrobbles, first_time, Scrobble.album, Scrobble.track)
-             .filter(Scrobble.user_id == current_user.id)
-             .filter(func.lower(Scrobble.artist) == name.lower())
-             .order_by(scrobbles.desc())
-             )
 
-    total_scrobbles, first_time_heard, _, _ = query.first()
+    total_scrobbles, first_time_heard = (
+        db.session.query(scrobbles, first_time)
+        .filter(Scrobble.user_id == current_user.id)
+        .filter(func.lower(Scrobble.artist) == name.lower())
+        .order_by(scrobbles.desc()).first()
+    )
 
-    top_albums = query.group_by(Scrobble.album).limit(count).all()
-    top_tracks = query.group_by(Scrobble.track).limit(count).all()
+    top_albums = (db.session
+                  .query(scrobbles, Scrobble.album)
+                  .filter(Scrobble.user_id == current_user.id)
+                  .filter(func.lower(Scrobble.artist) == name.lower())
+                  .group_by(Scrobble.album)
+                  .order_by(scrobbles.desc())
+                  .limit(count)
+                  .all())
+
+    top_tracks = (db.session
+                  .query(scrobbles, Scrobble.track)
+                  .filter(Scrobble.user_id == current_user.id)
+                  .filter(func.lower(Scrobble.artist) == name.lower())
+                  .group_by(Scrobble.track)
+                  .order_by(scrobbles.desc())
+                  .limit(count)
+                  .all())
 
     if not top_albums and not top_tracks:
         abort(404)
