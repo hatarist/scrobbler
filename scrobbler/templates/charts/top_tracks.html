@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% from 'partials/macros.html' import select_period, select_metatype with context %}
 
+{% block meta_title %}
+  Top tracks
+{% endblock %}
+
 {% block title %}
   Top {{ select_metatype('tracks') }} for {{ select_period('webui.top_tracks', period) }}
 {% endblock %}

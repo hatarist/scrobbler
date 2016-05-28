@@ -2,6 +2,7 @@ import datetime
 
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.types import TypeDecorator, Integer
 from sqlalchemy.orm import relationship
 
 from scrobbler import bcrypt, db
@@ -108,14 +109,7 @@ class Artist(db.Model):
     image_url = db.Column(db.String(255))
     playcount = db.Column(db.Integer, default=0)
 
-    # tags = relationship("ArtistTag", back_populates="artist")
-
-    @property
-    def tags(self):
-        return (db.session.query(ArtistTag)
-                .filter(ArtistTag.artist_id == self.id)
-                .order_by(ArtistTag.strength.desc())
-                )
+    tags = relationship("ArtistTag", back_populates="artist")
 
     def __str__(self):
         return self.name
@@ -126,10 +120,48 @@ class ArtistTag(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=False)
+    artist = relationship("Artist", back_populates="tags")
     tag = db.Column(db.String(255))
     strength = db.Column(db.Integer)
 
-    artist = relationship("Artist")
-
     def __str__(self):
         return self.tag
+
+
+class DiffArtists(db.Model):
+    """
+    This table contains the normalized results of string comparison algorightms.
+
+    - Dn contains the normalized value for the original artist names;
+    - DnL contains the normalized value for the lowercased artist names.
+
+    Each Dn field (D1, D2, D3 etc.) uses different algorithms (ifast_comp, Levenshtein, etc.).
+    """
+    __tablename__ = 'diff_artists'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    artist1 = db.Column(db.String(255), nullable=False)
+    artist2 = db.Column(db.String(255), nullable=False)
+
+    ignore = db.Column(db.Boolean, default=False, nullable=False)
+
+    # distance.ifast_comp()
+    D1 = db.Column(db.Float)
+    D1L = db.Column(db.Float)
+
+    # distance.levenshtein()
+    D2 = db.Column(db.Float)
+    D2L = db.Column(db.Float)
+
+    # distance.sorensen()
+    D3 = db.Column(db.Float)
+    D3L = db.Column(db.Float)
+
+    # distance.jaccard()
+    D4 = db.Column(db.Float)
+    D4L = db.Column(db.Float)
+
+    # distance.hamming()
+    D5 = db.Column(db.Float)
+    D5L = db.Column(db.Float)

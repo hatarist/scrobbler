@@ -1,14 +1,43 @@
 import calendar
 import datetime
 
-from flask import render_template
+from json import dumps
+
+from flask import render_template, request
 from flask.ext.login import current_user, login_required
 from sqlalchemy import func
 
 from scrobbler import app, db
 from scrobbler.models import NowPlaying, Scrobble
 from scrobbler.webui.helpers import get_argument
+from scrobbler.webui.consts import PERIODS
 from scrobbler.webui.views import blueprint
+
+
+@blueprint.route("/ajax/dashboard/per-hour/")
+def ajax_dashboard_per_hour():
+    arg_year = request.args.get('year', 'all')
+    arg_month = request.args.get('month', 'all')
+    arg_artist = request.args.get('artist', 'all')
+
+    count = func.count(Scrobble.id).label('count')
+    time = Scrobble.played_at
+    hour = func.extract('hour', time).label('hour')
+    weekday = func.extract('dow', time).label('weekday')
+    year = func.extract('year', time).label('year')
+    month = func.extract('month', time).label('month')
+
+    year_filter = (year >= 2009) if arg_year == 'all' else (year == arg_year)
+    month_filter = True if arg_month == 'all' else (month == arg_month)
+    artist_filter = True if arg_artist == 'all' else (Scrobble.artist == arg_artist)
+
+    per_hour = (db.session.query(weekday, hour, count)
+                .filter(year_filter)
+                .filter(month_filter)
+                .filter(artist_filter)
+                .group_by('weekday', 'hour').all())
+    per_hour = [(d + 1, h + 1, v) for d, h, v in per_hour]
+    return dumps(per_hour)
 
 
 @blueprint.route("/latest/")
@@ -138,3 +167,17 @@ def milestones():
         'stats/milestones.html',
         scrobbles=scrobbles
     )
+
+
+@blueprint.route("/dashboard/")
+@blueprint.route("/dashboard/<period>/")
+@login_required
+def dashboard(period=None):
+    period, days = PERIODS.get(period, PERIODS['1w'])
+
+    return render_template(
+        'dashboard.html',
+        period=period
+    )
+
+

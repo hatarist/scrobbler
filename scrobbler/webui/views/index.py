@@ -10,9 +10,3 @@ def index():
         return redirect(url_for('webui.dashboard'))
     else:
         return render_template('index.html')
-
-
-@blueprint.route("/dashboard/")
-@login_required
-def dashboard():
-    return render_template('dashboard.html')

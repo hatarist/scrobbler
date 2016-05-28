@@ -29,7 +29,7 @@ def sync(name, method=SYNC_META.INSERT_OR_UPDATE):
             tag = db.session.query(ArtistTag).filter(artist_id=artist.id, tag=tag_name).first()
 
             if tag is None:
-                tag = ArtistTag(artist_id=artist.id, tag=tag_name, strength=tag_weight)
+                tag = ArtistTag(artist=artist, tag=tag_name, strength=tag_weight)
 
             db.session.add(tag)
 
@@ -49,7 +49,7 @@ def sync(name, method=SYNC_META.INSERT_OR_UPDATE):
             tag = db.session.query(ArtistTag).filter(artist_id=artist.id, tag=tag_name).first()
 
             if tag is None:
-                tag = ArtistTag(artist_id=artist.id, tag=tag_name, strength=tag_weight)
+                tag = ArtistTag(artist=artist, tag=tag_name, strength=tag_weight)
 
             db.session.add(tag)
 

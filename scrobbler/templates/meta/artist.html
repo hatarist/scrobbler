@@ -2,7 +2,10 @@
 
 {% block title %}
   {{ artist.name or request.view_args.name|title }}
-  <a href="?sync_meta=2" class="btn btn-xs btn-info" role="button"><i class="glyphicon glyphicon-refresh"></i> sync info</a>
+{% endblock %}
+
+{% block toolbar %}
+  <a href="./?sync_meta=2" class="btn btn-xs btn-info" role="button"><i class="glyphicon glyphicon-refresh"></i> sync info</a>
 {% endblock %}
 
 {% block content %}

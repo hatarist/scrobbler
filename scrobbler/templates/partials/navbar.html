@@ -39,6 +39,9 @@
             (url_for('webui.unique_monthly'), True, "Unique Monthly"),
           ]),
 
+          ("Maintenance", True, [
+            (url_for('webui.maintenance_artists'), True, "Artists"),
+          ]),
         ] %}
 
         {% for name, login_required, urls in elements %}

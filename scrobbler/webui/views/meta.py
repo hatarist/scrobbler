@@ -76,17 +76,13 @@ def artist(name=None):
 @blueprint.route("/tag/<name>/")
 @login_required
 def tag(name=None):
-    scrobbles = func.count(Scrobble.artist).label('count')
+    top_artists = (db.session.query(Artist.name, ArtistTag.strength)
+                   .filter(func.lower(ArtistTag.tag) == name.lower())
+                   .filter(ArtistTag.artist_id == Artist.id)
+                   .order_by(ArtistTag.strength.desc())
+                   .all())
+    top_artists = [(name, str) for (name, str) in top_artists]
 
-    query = (db.session
-             .query(ArtistTag)
-             .filter(func.lower(ArtistTag.tag) == name.lower())
-             .filter(Scrobble.artist == ArtistTag.artist.name)
-             .order_by(scrobbles.desc())
-             .all()
-             )
-
-    top_artists = [(artist_tag.artist, artist_tag.strength) for artist_tag in query]
     top_artists = enumerate(top_artists, start=1)
 
     return render_template(
