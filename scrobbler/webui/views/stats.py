@@ -118,12 +118,15 @@ def unique_yearly():
     for year in range(year_from, year_to + 1):
         time_from = datetime.datetime(year, 1, 1)
         time_to = datetime.datetime(year, 12, 31, 23, 59, 59, 999999)
+        # select extract(year from played_at) as year, count(id) from scrobbles group by year;
         scrobbles = (db.session
                      .query(Scrobble)
                      .filter(Scrobble.user_id == current_user.id)
                      .filter(Scrobble.played_at >= time_from, Scrobble.played_at <= time_to)
                      .count()
                      )
+
+        # select extract(year from played_at) as year, sum(1) from scrobbles group by year, artist;
         unique_artists = (db.session
                           .query(Scrobble.artist)
                           .filter(Scrobble.user_id == current_user.id)

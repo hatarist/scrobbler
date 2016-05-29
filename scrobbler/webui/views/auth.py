@@ -15,6 +15,9 @@ from scrobbler.models import User
 
 @blueprint.route("/register/", methods=["GET", "POST"])
 def register():
+    flash('The pool is closed. :(', 'error')
+    return redirect(url_for('webui.index'))
+
     form = RegisterForm()
 
     if form.validate_on_submit():
