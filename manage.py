@@ -28,7 +28,9 @@ def initdb():
 
 
 @manager.command
-def find_similar_names(field_name):
+@manager.option('-c', '--chunks', dest='chunks', default=1, help='Split data to chunks of N')
+@manager.option('-i', '--index', dest='index', default=0, help='Start a chunk from index M')
+def find_similar_names(field_name, chunks, index):
     """
         Find similar names in the `scrobbles` table. Really useful to nuke the dupes.
 
@@ -36,10 +38,17 @@ def find_similar_names(field_name):
         ./manage.py find_similar_names D1
         ./manage.py find_similar_names D1L
 
+        You can also split it into chunks and run multiple processes for the faster processing:
+
+        ./manage.py find_similar D2 -c 4 -i 0  # runs the D2 algorithm over [0::4]
+        ./manage.py find_similar D2 -c 4 -i 1  # runs the D2 algorithm over [1::4]
+        ./manage.py find_similar D2 -c 4 -i 2  # runs the D2 algorithm over [2::4]
+        ./manage.py find_similar D2 -c 4 -i 3  # runs the D2 algorithm over [3::4]
+
         For further info about D-fields, see `DiffArtists` and `find_similar_artists()`.
     """
     from scrobbler.commands.metadata import find_similar_artists
-    find_similar_artists(field_name)
+    find_similar_artists(field_name, int(chunks), int(index))
 
 
 if __name__ == "__main__":

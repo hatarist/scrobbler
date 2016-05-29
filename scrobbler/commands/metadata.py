@@ -5,13 +5,15 @@ from scrobbler.meta.helpers import n_i_fast_comp, n_i_levenshtein
 from scrobbler.models import DiffArtists, Scrobble
 
 
-def find_similar_artists(field_name):
+def find_similar_artists(field_name, chunks, start_from):
     """
         `field_name` is a column name in the DiffArtists table ('D1', 'D1L', 'D2', 'D2L', etc.)
     """
     artists = db.session.query(
         func.count(Scrobble.artist).label('cnt'), Scrobble.artist.label('artist')
     ).group_by('artist').order_by(desc('cnt')).all()
+
+    artists = artists[start_from::chunks]
 
     artists_only = [artist[1] for artist in artists]
     already_compared = []
@@ -60,20 +62,18 @@ def find_similar_artists(field_name):
                         )
                     ).first()
 
-                if diff_artist:
-                    print('DiffArtist exists:', artist, artist2)
-                else:
-                    print('DiffArtist create:', artist, artist2)
+                if not diff_artist:
+                    # print('DiffArtist create:', artist, artist2)
                     diff_artist = DiffArtists(artist1=artist, artist2=artist2)
                     db.session.add(diff_artist)
 
-                print('[%d] find=%r   found=%r   D=%.5f' % (i, artist, artist2, D))
+                # print('[%d] find=%r   found=%r   D=%.5f' % (i, artist, artist2, D))
                 already_compared.append(pair1)
 
                 old_value = getattr(diff_artist, field_name)
                 if old_value is None:
                     setattr(diff_artist, field_name, D)
-                else:
-                    print("SKIPPING", artist, artist2, 'old_value =', old_value, 'new_value =', D)
+                # else:
+                #     print("SKIPPING", artist, artist2, 'old_value =', old_value, 'new_value =', D)
 
         db.session.commit()
