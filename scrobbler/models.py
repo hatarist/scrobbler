@@ -58,6 +58,12 @@ class User(db.Model):
     def get_id(self):
         return "{}".format(self.id)
 
+    def __str__(self):
+        return self.username
+
+    def __repr__(self):
+        return "<User {username}>".format(username=self.username)
+
 
 class Session(db.Model):
     __tablename__ = 'sessions'
@@ -87,6 +93,9 @@ class BaseScrobble():
     # Optional information
     musicbrainz = db.Column(db.String(255))
 
+    def __str__(self):
+        return "{artist} - {track}".format(artist=self.artist, track=self.track)
+
 
 class Scrobble(db.Model, BaseScrobble):
     __tablename__ = 'scrobbles'
@@ -94,9 +103,23 @@ class Scrobble(db.Model, BaseScrobble):
     source = db.Column(db.String(255))
     rating = db.Column(db.String(255))
 
+    def __repr__(self):
+        return "<Scrobble #{id}: {artist} - {title}>".format(
+            id=self.id,
+            artist=self.artist,
+            track=self.track
+        )
+
 
 class NowPlaying(db.Model, BaseScrobble):
     __tablename__ = 'np'
+
+    def __repr__(self):
+        return "<NP #{id}: {artist} - {title}>".format(
+            id=self.id,
+            artist=self.artist,
+            track=self.track
+        )
 
 
 class Artist(db.Model):
@@ -104,14 +127,22 @@ class Artist(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
+    # name_fixed = db.Column(db.String(255))
     bio = db.Column(db.Text)
     image_url = db.Column(db.String(255))
     playcount = db.Column(db.Integer, default=0)
+    # musicbrainz_id = db.Column(db.String(64))  # TODO: UUID (36)?
 
     tags = relationship("ArtistTag", back_populates="artist")
 
     def __str__(self):
         return self.name
+
+    def __repr__(self):
+        return "<Artist #{id}: {artist}>".format(
+            id=self.id,
+            artist=self.artist
+        )
 
 
 class ArtistTag(db.Model):
@@ -125,6 +156,13 @@ class ArtistTag(db.Model):
 
     def __str__(self):
         return self.tag
+
+    def __repr__(self):
+        return "<ArtistTag #{artist_id}-{id}: {tag}>".format(
+            artist_id=self.artist_id,
+            id=self.id,
+            tag=self.tag
+        )
 
 
 class DiffArtists(db.Model):

@@ -40,11 +40,19 @@ class LastFM(pylast.LastFMNetwork):
             self._connect()
 
         """Retrieves artist metadata with additional stuff (bio, image, tags etc.)"""
-        data = {'name': None, 'tags': [], 'bio': None, 'image': None, 'playcount': None}
+        data = {
+            'name': None,
+            'name_fixed': None,
+            'tags': [],
+            'bio': None,
+            'image': None,
+            'playcount': None
+        }
 
         try:
             artist_info = self.get_artist(artist_name)
             data['name'] = artist_info.name
+            data['name_fixed'] = artist_info.get_correction()
 
             if tags:
                 data['tags'] = artist_info.get_top_tags()
@@ -52,7 +60,8 @@ class LastFM(pylast.LastFMNetwork):
 
             if bio:
                 data['bio'] = artist_info.get_bio_summary()
-                data['bio'] = remove_html_tags(data['bio']).replace(' Read more on Last.fm', '')
+                data['bio'] = data['bio'].replace('Read more on Last.fm', '')
+                data['bio'] = remove_html_tags(data['bio']).strip()
 
             if image:
                 data['image'] = artist_info.get_cover_image()
