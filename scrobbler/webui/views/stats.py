@@ -32,9 +32,7 @@ def ajax_dashboard_per_hour():
     artist_filter = True if arg_artist == 'all' else (Scrobble.artist == arg_artist)
 
     per_hour = (db.session.query(weekday, hour, count)
-                .filter(year_filter)
-                .filter(month_filter)
-                .filter(artist_filter)
+                .filter(year_filter, month_filter, artist_filter)
                 .group_by('weekday', 'hour').all())
     per_hour = [(d + 1, h + 1, v) for d, h, v in per_hour]
     return dumps(per_hour)
@@ -83,8 +81,11 @@ def unique_monthly():
                          )
             unique_artists = (db.session
                               .query(Scrobble.artist)
-                              .filter(Scrobble.user_id == current_user.id)
-                              .filter(Scrobble.played_at >= time_from, Scrobble.played_at <= time_to)
+                              .filter(
+                                  Scrobble.user_id == current_user.id,
+                                  Scrobble.played_at >= time_from,
+                                  Scrobble.played_at <= time_to
+                              )
                               .group_by(Scrobble.artist)
                               .count()
                               )
@@ -182,5 +183,3 @@ def dashboard(period=None):
         'dashboard.html',
         period=period
     )
-
-

@@ -23,8 +23,7 @@ def top_artists(period=None):
     chart = (db.session
              .query(Scrobble.artist, scrobbles)
              .group_by(Scrobble.artist)
-             .filter(Scrobble.user_id == current_user.id)
-             .filter(Scrobble.played_at >= time_from)
+             .filter(Scrobble.user_id == current_user.id, Scrobble.played_at >= time_from)
              .order_by(scrobbles.desc())
              .limit(count)
              .all()
@@ -52,8 +51,7 @@ def top_tracks(period=None):
     time_from = datetime.datetime.now() - datetime.timedelta(days=days)
     chart = (db.session
              .query(Scrobble.artist, Scrobble.track, scrobbles)
-             .group_by(Scrobble.artist, Scrobble.track)
-             .filter(Scrobble.user_id == current_user.id)
+             .group_by(Scrobble.artist, Scrobble.track, Scrobble.user_id == current_user.id)
              .filter(Scrobble.played_at >= time_from)
              .order_by(scrobbles.desc())
              .limit(count)
@@ -87,8 +85,11 @@ def top_yearly_tracks():
         time_to = datetime.datetime(year, 12, 31, 23, 59, 59, 999999)
         charts[year] = (db.session
                         .query(Scrobble.artist, Scrobble.track, scrobbles)
-                        .filter(Scrobble.user_id == current_user.id)
-                        .filter(Scrobble.played_at >= time_from, Scrobble.played_at <= time_to)
+                        .filter(
+                            Scrobble.user_id == current_user.id,
+                            Scrobble.played_at >= time_from,
+                            Scrobble.played_at <= time_to
+                        )
                         .group_by(Scrobble.artist, Scrobble.track)
                         .order_by(scrobbles.desc())
                         .limit(stat_count)
@@ -98,17 +99,25 @@ def top_yearly_tracks():
     position_changes = {}
 
     for year in range(year_from + 1, year_to + 1):
-
         chart = {
-            '{} – {}'.format(artist, track): position for position, (artist, track, scrobbles) in enumerate(charts[year], 1)
+            '{} – {}'.format(artist, track): position
+            for position, (artist, track, scrobbles) in enumerate(charts[year], 1)
         }
 
         prev_chart = {
-            '{} – {}'.format(artist, track): position for position, (artist, track, scrobbles) in enumerate(charts[year - 1], 1)
+            '{} – {}'.format(artist, track): position
+            for position, (artist, track, scrobbles) in enumerate(charts[year - 1], 1)
         }
 
-        prev_charts = (chart for chart_year, chart in charts.items() if chart_year < year)
-        prev_tracks = {'{} – {}'.format(artist, track) for chart in prev_charts for (artist, track, scrobbles) in chart}
+        prev_charts = (
+            chart for chart_year, chart in charts.items() if chart_year < year
+        )
+
+        prev_tracks = {
+            '{} – {}'.format(artist, track)
+            for chart in prev_charts
+            for (artist, track, scrobbles) in chart
+        }
 
         if year not in position_changes:
             position_changes[year] = {}

@@ -2,8 +2,8 @@ import datetime
 
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.types import TypeDecorator, Integer
 from sqlalchemy.orm import relationship
+
 
 from scrobbler import bcrypt, db
 from scrobbler.api.helpers import md5
@@ -19,7 +19,6 @@ class User(db.Model):
     _webui_password = db.Column('webui_password', db.String(128))
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.datetime.utcnow)
-    settings = db.Column(db.String(255))
 
     sessions = db.relationship('Session', backref='user')
 
