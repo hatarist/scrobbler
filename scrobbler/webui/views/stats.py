@@ -18,7 +18,7 @@ from scrobbler.webui.views import blueprint
 def ajax_dashboard_per_hour():
     arg_year = request.args.get('year', 'all')
     arg_month = request.args.get('month', 'all')
-    arg_artist = request.args.get('artist', 'all')
+    arg_artist = request.args.get('artist', '')
 
     count = func.count(Scrobble.id).label('count')
     time = Scrobble.played_at
@@ -29,7 +29,7 @@ def ajax_dashboard_per_hour():
 
     year_filter = (year >= 2009) if arg_year == 'all' else (year == arg_year)
     month_filter = True if arg_month == 'all' else (month == arg_month)
-    artist_filter = True if arg_artist == 'all' else (Scrobble.artist == arg_artist)
+    artist_filter = True if arg_artist == '' else (Scrobble.artist == arg_artist)
 
     per_hour = (db.session.query(weekday, hour, count)
                 .filter(year_filter, month_filter, artist_filter)
