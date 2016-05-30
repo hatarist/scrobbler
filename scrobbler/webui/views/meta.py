@@ -22,7 +22,7 @@ def artist(name=None):
         return redirect(url_for('webui.artist', name=name))
 
     # Meta data
-    artist = db.session.query(Artist).filter(func.lower(Artist.name) == name.lower()).first()
+    artist = db.session.query(Artist).filter(Artist.name == name).first()
 
     # Stats
     scrobbles = func.count(Scrobble.track).label('count')
@@ -31,14 +31,14 @@ def artist(name=None):
     total_scrobbles, first_time_heard = (
         db.session.query(scrobbles, first_time)
         .filter(Scrobble.user_id == current_user.id)
-        .filter(func.lower(Scrobble.artist) == name.lower())
+        .filter(Scrobble.artist == name)
         .order_by(scrobbles.desc()).first()
     )
 
     top_albums = (db.session
                   .query(scrobbles, Scrobble.album)
                   .filter(Scrobble.user_id == current_user.id)
-                  .filter(func.lower(Scrobble.artist) == name.lower())
+                  .filter(Scrobble.artist == name)
                   .group_by(Scrobble.album)
                   .order_by(scrobbles.desc())
                   .limit(count)
@@ -47,7 +47,7 @@ def artist(name=None):
     top_tracks = (db.session
                   .query(scrobbles, Scrobble.track)
                   .filter(Scrobble.user_id == current_user.id)
-                  .filter(func.lower(Scrobble.artist) == name.lower())
+                  .filter(Scrobble.artist == name)
                   .group_by(Scrobble.track)
                   .order_by(scrobbles.desc())
                   .limit(count)

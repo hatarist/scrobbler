@@ -1,5 +1,3 @@
-from sqlalchemy import func
-
 from scrobbler import db, lastfm
 from scrobbler.meta.consts import SYNC_META
 from scrobbler.models import Artist, ArtistTag
@@ -7,7 +5,7 @@ from scrobbler.models import Artist, ArtistTag
 
 def sync(name, method=SYNC_META.INSERT_OR_UPDATE):
     artist = (db.session.query(Artist)
-              .filter(func.lower(Artist.name) == name.lower())
+              .filter(Artist.name == name)
               .first())
 
     data = lastfm.artist(name)
