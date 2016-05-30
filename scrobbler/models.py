@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -18,7 +18,7 @@ class User(db.Model):
     _api_password = db.Column('api_password', db.String(32))
     _webui_password = db.Column('webui_password', db.String(128))
     is_active = db.Column(db.Boolean, default=True, nullable=False)
-    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.datetime.utcnow)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.now)
 
     sessions = db.relationship('Session', backref='user')
 

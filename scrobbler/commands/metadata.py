@@ -57,8 +57,13 @@ def find_similar_artists(field_name, chunks, start_from):
                     diff_artist = (
                         db.session.query(DiffArtists)
                         .filter(
-                            ((func.lower(DiffArtists.artist1) == artist.lower()) & (func.lower(DiffArtists.artist2) == artist2.lower())) |
-                            ((func.lower(DiffArtists.artist1) == artist2.lower()) & (func.lower(DiffArtists.artist2) == artist.lower()))
+                            (
+                                (func.lower(DiffArtists.artist1) == artist.lower()) &
+                                (func.lower(DiffArtists.artist2) == artist2.lower())
+                            ) | (  # OR
+                                (func.lower(DiffArtists.artist1) == artist2.lower()) &
+                                (func.lower(DiffArtists.artist2) == artist.lower())
+                            )
                         )
                     ).first()
 
