@@ -77,3 +77,28 @@ def find_similar_artists(field_name, chunks, start_from):
                 #     print("SKIPPING", artist, artist2, 'old_value =', old_value, 'new_value =', D)
 
         db.session.commit()
+
+
+def fix_scrobble_length():
+    old_query = (db.session.query(Scrobble.artist, Scrobble.track)
+                 .filter(Scrobble.id < 134266)
+                 .group_by(Scrobble.artist, Scrobble.track))
+
+    new_query = (db.session.query(Scrobble.artist, Scrobble.track, func.avg(Scrobble.length))
+                 .filter(Scrobble.id >= 134266)
+                 .group_by(Scrobble.artist, Scrobble.track).all())
+
+    new_data = {'{0} - {1}'.format(*scrobble): int(scrobble[2]) for scrobble in new_query}
+
+    for pair in old_query:
+        name = '{0} - {1}'.format(*pair)
+        length = new_data.get(name, 0)
+
+        scrobbles = (
+            db.session.query(Scrobble)
+            .filter(Scrobble.id < 134266, Scrobble.artist == pair[0], Scrobble.track == pair[1])
+        )
+
+        scrobbles.update({'length': length})
+
+    db.session.commit()

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from flask.ext.script import Manager
 
 from scrobbler.wsgi import app, db
@@ -49,6 +50,12 @@ def find_similar_names(field_name, chunks, index):
     """
     from scrobbler.commands.metadata import find_similar_artists
     find_similar_artists(field_name, int(chunks), int(index))
+
+
+@manager.command
+def fix_length():
+    from scrobbler.commands.metadata import fix_scrobble_length
+    fix_scrobble_length()
 
 
 if __name__ == "__main__":
