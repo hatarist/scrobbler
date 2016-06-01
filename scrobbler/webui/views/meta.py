@@ -25,7 +25,7 @@ def artist(name=None):
     artist = db.session.query(Artist).filter(Artist.name == name).first()
 
     # Stats
-    scrobbles = func.count(Scrobble.track).label('count')
+    scrobbles = func.count(Scrobble.id).label('count')
     first_time = func.min(Scrobble.played_at).label('first_time')
 
     total_scrobbles, first_time_heard = (
@@ -34,6 +34,27 @@ def artist(name=None):
         .filter(Scrobble.artist == name)
         .order_by(scrobbles.desc()).first()
     )
+
+    if total_scrobbles == 0:
+        abort(404)
+
+    year = func.extract('year', Scrobble.played_at).label('year')
+
+    scrobbles_per_year = (
+        db.session.query(year, scrobbles)
+        .filter(Scrobble.artist == name)
+        .group_by(Scrobble.artist, 'year')
+        .order_by(year).all()
+    )
+
+    max_scrobbles_per_year = max(x[1] for x in scrobbles_per_year)
+
+    # Fill with zeroes if years skipped
+    min_year = int(min(x[0] for x in scrobbles_per_year))
+    max_year = int(max(x[0] for x in scrobbles_per_year))
+    scrobbles_per_year = dict(scrobbles_per_year)
+    scrobbles_per_year = {y: scrobbles_per_year.get(y, 0) for y in range(min_year, max_year + 1)}
+    scrobbles_per_year = sorted(scrobbles_per_year.items())
 
     top_albums = (db.session
                   .query(scrobbles, Scrobble.album)
@@ -53,9 +74,6 @@ def artist(name=None):
                   .limit(count)
                   .all())
 
-    if not top_albums and not top_tracks:
-        abort(404)
-
     max_album_scrobbles = top_albums[0][0]
     max_track_scrobbles = top_tracks[0][0]
 
@@ -69,7 +87,9 @@ def artist(name=None):
         top_albums=top_albums,
         top_tracks=top_tracks,
         max_album_scrobbles=max_album_scrobbles,
-        max_track_scrobbles=max_track_scrobbles
+        max_track_scrobbles=max_track_scrobbles,
+        scrobbles_per_year=scrobbles_per_year,
+        max_scrobbles_per_year=max_scrobbles_per_year,
     )
 
 
