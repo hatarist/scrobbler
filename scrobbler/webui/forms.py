@@ -1,5 +1,5 @@
 from flask_wtf import Form
-from wtforms import BooleanField, PasswordField, StringField, SubmitField
+from wtforms import BooleanField, PasswordField, SelectField, StringField, SubmitField
 from wtforms.validators import Required, Optional, Length, EqualTo, Email
 
 
@@ -34,3 +34,16 @@ class ChangeAPIPasswordForm(BaseChangePasswordForm):
 
 class ChangeWebUIPasswordForm(BaseChangePasswordForm):
     webui_pass = SubmitField('Change password')
+
+
+class CorrectionForm(Form):
+    CHOICES = (
+        ('artist', 'Artist'),
+        ('track', 'Track'),
+        ('tag', 'Tag'),
+    )
+
+    type = SelectField(u'Type', choices=CHOICES, validators=[Required()])
+
+    old = StringField('Old', validators=[Required()])
+    new = StringField('New', validators=[Required()])

@@ -15,7 +15,7 @@ from scrobbler.models import User
 
 @blueprint.route("/register/", methods=["GET", "POST"])
 def register():
-    flash('The pool is closed. :(', 'error')
+    flash('The pool is closed. :(', category='error')
     return redirect(url_for('webui.index'))
 
     form = RegisterForm()
@@ -31,7 +31,7 @@ def register():
         db.session.commit()
 
         login_user(user)
-        flash('Happy scrobbling!', 'success')
+        flash('Happy scrobbling!', category='success')
         return redirect(url_for('webui.dashboard'))
     else:
         show_form_errors(form)
@@ -75,21 +75,21 @@ def settings():
 
     if form_api_pass.validate_on_submit() and form_api_pass.api_pass.data:
         if not current_user.validate_api_password(form_api_pass.current_password.data):
-            flash("Wrong current API password.", 'error')
+            flash("Wrong current API password.", category='error')
         else:
             current_user.api_password = form_api_pass.password.data
             db.session.commit()
-            flash("API password has been changed.", 'success')
+            flash("API password has been changed.", category='success')
     else:
         show_form_errors(form_api_pass)
 
     if form_webui_pass.validate_on_submit() and form_webui_pass.webui_pass.data:
         if not current_user.validate_webui_password(form_webui_pass.current_password.data):
-            flash("Wrong current WebUI password.", 'error')
+            flash("Wrong current WebUI password.", category='error')
         else:
             current_user.webui_password = form_webui_pass.password.data
             db.session.commit()
-            flash("WebUI password has been changed.", 'success')
+            flash("WebUI password has been changed.", category='success')
     else:
         show_form_errors(form_webui_pass)
 

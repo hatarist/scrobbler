@@ -231,3 +231,12 @@ text.axis-workweek {
 text.axis-worktime {
   fill: #000;
 }
+
+.mini-form {
+    padding-left: 15px;
+}
+
+.mini-form .form-group div {
+    padding-left: 5px;
+    padding-right: 5px;
+}

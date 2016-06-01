@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Corrections{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-3"></div>
+  <div class="col-md-6">
+  <h3>Add</h3>
+  <form action="." class="mini-form row" method="post">
+    {{ form.csrf_token }}
+
+    <div class="form-group">
+      <div class="col-sm-2">
+        {{ form.type(class_="form-control", placeholder="Type") }}
+      </div>
+      <div class="col-sm-4">
+        {{ form.old(class_="form-control", placeholder="Old") }}
+      </div>
+      <div class="col-sm-4">
+        {{ form.new(class_="form-control", placeholder="New") }}
+      </div>
+      <div class="col-sm-2">
+        <button type="submit" class="btn btn-default">Save</button>
+      </div>
+    </div>
+  </form>
+
+  <h3>Artist</h3>
+  <table class="table table-striped table-condensed table-hover chart">
+    <tr class="row">
+      <th class="col-sm-5">Old</th>
+      <th class="col-sm-5">New</th>
+      <th class="col-sm-1">Actions</th>
+    </tr>
+    {% for correction in artist_corrections %}
+      <tr class="row">
+        <td class="col-sm-5">{{ correction.old }}</td>
+        <td class="col-sm-5">{{ correction.new }}</td>
+        <td class="col-sm-1">
+          <a href="{{ url_for('webui.maintenance_corrections_delete', type='artist', id=correction.id) }}" class="btn btn-xs btn-warning" role="button">
+            <i class="glyphicon glyphicon-remove"></i>
+          </a>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+
+  <h3>Track</h3>
+  <table class="table table-striped table-condensed table-hover chart">
+    <tr class="row">
+      <th class="col-sm-5">Old</th>
+      <th class="col-sm-5">New</th>
+      <th class="col-sm-1">Actions</th>
+    </tr>
+    {% for correction in track_corrections %}
+      <tr class="row">
+        <td class="col-sm-5">{{ correction.old }}</td>
+        <td class="col-sm-5">{{ correction.new }}</td>
+        <td class="col-sm-1">
+          <a href="{{ url_for('webui.maintenance_corrections_delete', type='track', id=correction.id) }}" class="btn btn-xs btn-warning" role="button">
+            <i class="glyphicon glyphicon-remove"></i>
+          </a>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+
+  <h3>Tag</h3>
+  <table class="table table-striped table-condensed table-hover chart">
+    <tr class="row">
+      <th class="col-sm-5">Old</th>
+      <th class="col-sm-5">New</th>
+      <th class="col-sm-1">Actions</th>
+    </tr>
+    {% for correction in tag_corrections %}
+      <tr class="row">
+        <td class="col-sm-5">{{ correction.old }}</td>
+        <td class="col-sm-5">{{ correction.new }}</td>
+        <td class="col-sm-1">
+          <a href="{{ url_for('webui.maintenance_corrections_delete', type='tag', id=correction.id) }}" class="btn btn-xs btn-warning" role="button">
+            <i class="glyphicon glyphicon-remove"></i>
+          </a>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+
+  </div>
+  <div class="col-md-3"></div>
+</div>
+{% endblock %}

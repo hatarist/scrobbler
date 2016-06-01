@@ -1,8 +1,9 @@
 from datetime import datetime
 
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import relationship
 
 from scrobbler import bcrypt, db
 from scrobbler.api.helpers import md5
@@ -191,3 +192,24 @@ class DiffTracks(db.Model, BaseDiff):
     artist = db.Column(db.String(255), nullable=False)
     track1 = db.Column(db.String(255), nullable=False)
     track2 = db.Column(db.String(255), nullable=False)
+
+
+class BaseCorrection(object):
+    id = db.Column(db.Integer, primary_key=True)
+    old = db.Column(db.String(255), nullable=False)
+    new = db.Column(db.String(255), nullable=False)
+
+
+class ArtistCorrection(BaseCorrection, db.Model):
+    __tablename__ = 'correction_artists'
+
+
+class TrackCorrection(BaseCorrection, db.Model):
+    __tablename__ = 'correction_tracks'
+
+    artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=False)
+    artist = relationship("Artist")
+
+
+class TagCorrection(BaseCorrection, db.Model):
+    __tablename__ = 'correction_tags'

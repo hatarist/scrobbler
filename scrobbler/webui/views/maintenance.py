@@ -3,8 +3,16 @@ from flask.ext.login import login_required
 from sqlalchemy import desc, func
 
 from scrobbler import db
-from scrobbler.models import DiffArtists, DiffTracks, Scrobble
-from scrobbler.webui.helpers import get_argument
+from scrobbler.models import (
+    ArtistCorrection,
+    DiffArtists,
+    DiffTracks,
+    Scrobble,
+    TagCorrection,
+    TrackCorrection,
+)
+from scrobbler.webui.forms import CorrectionForm
+from scrobbler.webui.helpers import get_argument, show_form_errors
 from scrobbler.webui.views import blueprint
 
 
@@ -135,3 +143,61 @@ def maintenance_track_fix(id, direction):
 
     flash('{} scrobbles were replaced successfully!'.format(count_to_replace), category='success')
     return 'OK'
+
+
+@blueprint.route("/maintenance/corrections/", methods=["GET", "POST"])
+@login_required
+def maintenance_corrections():
+    form = CorrectionForm()
+
+    ctx = {
+        'form': form,
+    }
+
+    if form.validate_on_submit():
+        if form.type.data == 'artist':
+            model = ArtistCorrection
+        elif form.type.data == 'tag':
+            model = TagCorrection
+        else:
+            flash("Not implemented yet :(", category='error')
+            return render_template('maintenance/corrections.html', **ctx)
+
+        obj = model(old=form.old.data, new=form.new.data)
+        db.session.add(obj)
+        db.session.commit()
+
+        flash('Your correction was added, thanks!', category='success')
+        return redirect(url_for('webui.maintenance_corrections'))
+    else:
+        show_form_errors(form)
+
+    ctx.update({
+        'artist_corrections': db.session.query(ArtistCorrection).all(),
+        'track_corrections': db.session.query(TrackCorrection).all(),
+        'tag_corrections': db.session.query(TagCorrection).all(),
+    })
+
+    return render_template('maintenance/corrections.html', **ctx)
+
+
+@blueprint.route("/maintenance/corrections/<type>/<int:id>/delete/")
+@login_required
+def maintenance_corrections_delete(type, id):
+    if type == 'artist':
+        model = ArtistCorrection
+    elif type == 'tag':
+        model = TagCorrection
+    else:
+        flash("Not implemented yet :(", category='error')
+        return redirect(url_for('webui.maintenance_corrections'))
+
+    correction = db.session.query(model).get(id)
+
+    if not correction:
+        abort(404)
+
+    db.session.delete(correction)
+    db.session.commit()
+    flash('Correction was deleted.')
+    return redirect(url_for('webui.maintenance_corrections'))
