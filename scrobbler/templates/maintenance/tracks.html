@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Artist Maintenance{% endblock %}
+{% block title %}Track Maintenance{% endblock %}
 {% block toolbar %}
   {% if request.args.get('show_ignored') %}
     <a href="." class="btn btn-xs btn-warning" role="button"><i class="glyphicon glyphicon-search"></i> show all</a>
@@ -17,36 +17,33 @@
     <table class="table table-striped table-condensed table-hover chart">
       <tr>
         <th class="id">#</th>
-        <th class="name">Artist Left</th>
+        <th class="name">Track Left</th>
         <th class="id">#</th>
         <th>Apply</th>
         <th class="id">#</th>
-        <th class="name">Artist Right</th>
+        <th class="name">Track Right</th>
       </tr>
       {% for diff in diffs %}
         <tr>
           <td class="place">{{ diff.id }}</td>
           <td class="name">
-            <a href="{{ url_for('webui.maintenance_tracks') }}?artist={{ diff.artist1 }}" class="btn btn-xs btn-success" role="button">
-              <i class="glyphicon glyphicon-search"></i>
-            </a>
-            <a href="{{ url_for('webui.artist', name=diff.artist1) }}"><pre>{{ diff.artist1 }}</pre></a>
+            <a href="{{ url_for('webui.artist', name=diff.artist) }}"><pre>{{ diff.artist }} – {{ diff.track1 }}</pre></a>
           </td>
-          <td class="id">{{ artist_count[diff.artist1] }}</td>
+          <td class="id">{{ track_count.get(diff.artist, {}).get(diff.track1, 0) }}</td>
           <td>
-            <a href="{{ url_for('webui.maintenance_artist_fix', id=diff.id, direction=2) }}" class="btn btn-xs btn-info" role="button">
+            <a href="{{ url_for('webui.maintenance_track_fix', id=diff.id, direction=2) }}" class="btn btn-xs btn-info" role="button">
               <i class="glyphicon glyphicon-menu-left"></i>
             </a>
-            <a href="{{ url_for('webui.maintenance_artist_fix', id=diff.id, direction=0) }}" class="btn btn-xs btn-warning" role="button">
+            <a href="{{ url_for('webui.maintenance_track_fix', id=diff.id, direction=0) }}" class="btn btn-xs btn-warning" role="button">
               <i class="glyphicon glyphicon-remove"></i>
             </a>
-            <a href="{{ url_for('webui.maintenance_artist_fix', id=diff.id, direction=1) }}" class="btn btn-xs btn-info" role="button">
+            <a href="{{ url_for('webui.maintenance_track_fix', id=diff.id, direction=1) }}" class="btn btn-xs btn-info" role="button">
               <i class="glyphicon glyphicon-menu-right"></i>
             </a>
           </td>
-          <td class="id">{{ artist_count[diff.artist2] }}</td>
+          <td class="id">{{ track_count.get(diff.artist, {}).get(diff.track2, 0) }}</td>
           <td class="name">
-            <a href="{{ url_for('webui.artist', name=diff.artist2) }}"><pre>{{ diff.artist2 }}</pre></a>
+            <a href="{{ url_for('webui.artist', name=diff.artist2) }}"><pre>{{ diff.artist }} - {{ diff.track2 }}</pre></a>
           </td>
         </tr>
       {% endfor %}

@@ -12,12 +12,12 @@ def make_shell_context():
     from pprint import pprint
 
     from flask_sqlalchemy import get_debug_queries
-    from sqlalchemy import func
+    from sqlalchemy import desc, func
 
     from scrobbler.models import Artist, NowPlaying, Scrobble, Session, User
 
     return dict(
-        app=app, db=db, pprint=pprint, gq=get_debug_queries, func=func,
+        app=app, db=db, pprint=pprint, gq=get_debug_queries, func=func, desc=desc,
         Scrobble=Scrobble, NowPlaying=NowPlaying, User=User, Session=Session, Artist=Artist
     )
 
@@ -30,9 +30,9 @@ def initdb():
 @manager.command
 @manager.option('-c', '--chunks', dest='chunks', default=1, help='Split data to chunks of N')
 @manager.option('-i', '--index', dest='index', default=0, help='Start a chunk from index M')
-def find_similar_names(field_name, chunks, index):
+def find_similar_artists(field_name, chunks, index):
     """
-        Find similar names in the `scrobbles` table. Really useful to nuke the dupes.
+        Find similar artist names in the `scrobbles` table. Really useful to nuke the dupes.
 
         Usage:
         ./manage.py find_similar_names D1
@@ -49,6 +49,18 @@ def find_similar_names(field_name, chunks, index):
     """
     from scrobbler.commands.metadata import find_similar_artists
     find_similar_artists(field_name, int(chunks), int(index))
+
+
+@manager.command
+@manager.option('-a', '--artists-count', dest='count', default=50, help='Fix data for top N artists')
+@manager.option('-c', '--chunks', dest='chunks', default=1, help='Split data to chunks of N')
+@manager.option('-i', '--index', dest='index', default=0, help='Start a chunk from index M')
+def find_similar_tracks(field_name, count, chunks, index):
+    """
+        Find similar track names in the `scrobbles` table. Really useful to nuke the dupes.
+    """
+    from scrobbler.commands.metadata import find_similar_tracks
+    find_similar_tracks(field_name, int(count), int(chunks), int(index))
 
 
 @manager.command

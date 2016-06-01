@@ -73,7 +73,7 @@ class Session(db.Model):
     created_at = db.Column(db.DateTime(timezone=True))
 
 
-class BaseScrobble():
+class BaseScrobble(object):
     id = db.Column(db.Integer, primary_key=True)
 
     @declared_attr
@@ -88,6 +88,7 @@ class BaseScrobble():
     album = db.Column(db.String(255))
     tracknumber = db.Column(db.String(255))
     length = db.Column(db.Integer, nullable=False)
+    musicbrainz = db.Column(db.String(255))
 
     def __str__(self):
         return "{artist} - {track}".format(artist=self.artist, track=self.track)
@@ -123,6 +124,7 @@ class Artist(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
+    # initial_name = db.Column(db.String(255))
     bio = db.Column(db.Text)
     image_url = db.Column(db.String(255))
     playcount = db.Column(db.Integer, default=0)
@@ -139,21 +141,15 @@ class Artist(db.Model):
         )
 
 
-class DiffArtists(db.Model):
+class BaseDiff(object):
     """
     This table contains the normalized results of string comparison algorightms.
 
-    - Dn contains the normalized value for the original artist names;
-    - DnL contains the normalized value for the lowercased artist names.
+    - Dn contains the normalized value for the original object names;
+    - DnL contains the normalized value for the lowercased object names.
 
     Each Dn field (D1, D2, D3 etc.) uses different algorithms (ifast_comp, Levenshtein, etc.).
     """
-    __tablename__ = 'diff_artists'
-
-    id = db.Column(db.Integer, primary_key=True)
-
-    artist1 = db.Column(db.String(255), nullable=False)
-    artist2 = db.Column(db.String(255), nullable=False)
 
     ignore = db.Column(db.Boolean, default=False, nullable=False)
 
@@ -176,3 +172,22 @@ class DiffArtists(db.Model):
     # distance.hamming()
     D5 = db.Column(db.Float)
     D5L = db.Column(db.Float)
+
+
+class DiffArtists(db.Model, BaseDiff):
+    __tablename__ = 'diff_artists'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    artist1 = db.Column(db.String(255), nullable=False)
+    artist2 = db.Column(db.String(255), nullable=False)
+
+
+class DiffTracks(db.Model, BaseDiff):
+    __tablename__ = 'diff_tracks'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    artist = db.Column(db.String(255), nullable=False)
+    track1 = db.Column(db.String(255), nullable=False)
+    track2 = db.Column(db.String(255), nullable=False)
