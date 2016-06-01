@@ -2,8 +2,7 @@ from datetime import datetime
 
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship
-
+from sqlalchemy.dialects.postgresql import JSONB
 
 from scrobbler import bcrypt, db
 from scrobbler.api.helpers import md5
@@ -90,9 +89,6 @@ class BaseScrobble():
     tracknumber = db.Column(db.String(255))
     length = db.Column(db.Integer, nullable=False)
 
-    # Optional information
-    musicbrainz = db.Column(db.String(255))
-
     def __str__(self):
         return "{artist} - {track}".format(artist=self.artist, track=self.track)
 
@@ -127,13 +123,11 @@ class Artist(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
-    # name_fixed = db.Column(db.String(255))
     bio = db.Column(db.Text)
     image_url = db.Column(db.String(255))
     playcount = db.Column(db.Integer, default=0)
-    # musicbrainz_id = db.Column(db.String(64))  # TODO: UUID (36)?
-
-    tags = relationship("ArtistTag", back_populates="artist")
+    mbid = db.Column(db.String(64))
+    tags = db.Column(JSONB)
 
     def __str__(self):
         return self.name
@@ -141,27 +135,7 @@ class Artist(db.Model):
     def __repr__(self):
         return "<Artist #{id}: {artist}>".format(
             id=self.id,
-            artist=self.artist
-        )
-
-
-class ArtistTag(db.Model):
-    __tablename__ = 'artist_tags'
-
-    id = db.Column(db.Integer, primary_key=True)
-    artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=False)
-    artist = relationship("Artist", back_populates="tags")
-    tag = db.Column(db.String(255))
-    strength = db.Column(db.Integer)
-
-    def __str__(self):
-        return self.tag
-
-    def __repr__(self):
-        return "<ArtistTag #{artist_id}-{id}: {tag}>".format(
-            artist_id=self.artist_id,
-            id=self.id,
-            tag=self.tag
+            artist=self.name
         )
 
 

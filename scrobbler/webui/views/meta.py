@@ -1,9 +1,9 @@
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask.ext.login import current_user, login_required
-from sqlalchemy import func
+from sqlalchemy import desc, func
 
 from scrobbler import app, db, meta
-from scrobbler.models import Artist, ArtistTag, Scrobble
+from scrobbler.models import Artist, Scrobble
 from scrobbler.webui.helpers import get_argument
 from scrobbler.webui.views import blueprint
 
@@ -76,12 +76,12 @@ def artist(name=None):
 @blueprint.route("/tag/<name>/")
 @login_required
 def tag(name=None):
-    top_artists = (db.session.query(Artist.name, ArtistTag.strength)
-                   .filter(func.lower(ArtistTag.tag) == name.lower())
-                   .filter(ArtistTag.artist_id == Artist.id)
-                   .order_by(ArtistTag.strength.desc())
+    name = name.lower()
+    top_artists = (db.session.query(Artist.name, Artist.tags[name].label('count'))
+                   .filter(Artist.tags.has_key(name))
+                   .order_by(desc('count'), Artist.playcount.desc())
                    .all())
-    top_artists = [(name, str) for (name, str) in top_artists]
+    # top_artists = [(name, str) for (name, str, ) in top_artists]
 
     top_artists = enumerate(top_artists, start=1)
 

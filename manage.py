@@ -14,12 +14,11 @@ def make_shell_context():
     from flask_sqlalchemy import get_debug_queries
     from sqlalchemy import func
 
-    from scrobbler.models import Scrobble, User, Session, NowPlaying, Artist, ArtistTag
+    from scrobbler.models import Artist, NowPlaying, Scrobble, Session, User
 
     return dict(
         app=app, db=db, pprint=pprint, gq=get_debug_queries, func=func,
-        Scrobble=Scrobble, NowPlaying=NowPlaying, User=User, Session=Session, Artist=Artist,
-        ArtistTag=ArtistTag,
+        Scrobble=Scrobble, NowPlaying=NowPlaying, User=User, Session=Session, Artist=Artist
     )
 
 
