@@ -30,12 +30,14 @@ class LastFM(pylast.LastFMNetwork):
                 password_hash=pylast.md5(self.app.config['LASTFM_PASSWORD'])
             )
 
+            self.enable_caching()
+
             self._connected = True
         except pylast.MalformedResponseError:
             logger.warning("[Flask.ext.LastFM] Got a malformed response. Please check "
                            "that you are not overriding Last.FM servers in /etc/hosts")
 
-    def artist(self, artist_name, tags=20, bio=True, image=True, playcount=True):
+    def artist(self, artist_name, tags=20):
         if not self._connected:
             self._connect()
 
@@ -46,7 +48,8 @@ class LastFM(pylast.LastFMNetwork):
             'tags': [],
             'bio': None,
             'image': None,
-            'playcount': None
+            'playcount': None,
+            'mbid': None,
         }
 
         try:
@@ -54,20 +57,16 @@ class LastFM(pylast.LastFMNetwork):
             data['name'] = artist_info.name
             data['name_fixed'] = artist_info.get_correction()
 
-            if tags:
-                data['tags'] = artist_info.get_top_tags()
-                data['tags'] = [(tag.item.name.lower(), tag.weight) for tag in data['tags'][:tags]]
+            data['tags'] = artist_info.get_top_tags()
+            data['tags'] = [(tag.item.name.lower(), tag.weight) for tag in data['tags'][:tags]]
 
-            if bio:
-                data['bio'] = artist_info.get_bio_summary()
-                data['bio'] = data['bio'].replace('Read more on Last.fm', '')
-                data['bio'] = remove_html_tags(data['bio']).strip()
+            data['bio'] = artist_info.get_bio_summary()
+            data['bio'] = data['bio'].replace('Read more on Last.fm', '')
+            data['bio'] = remove_html_tags(data['bio']).strip()
 
-            if image:
-                data['image'] = artist_info.get_cover_image()
-
-            if playcount:
-                data['playcount'] = artist_info.get_playcount()
+            data['image'] = artist_info.get_cover_image()
+            data['playcount'] = artist_info.get_playcount()
+            data['mbid'] = artist_info.get_mbid()
 
         except Exception:
             self._connected = False
