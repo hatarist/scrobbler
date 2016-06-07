@@ -8,7 +8,7 @@ from scrobbler.webui.helpers import get_argument
 from scrobbler.webui.views import blueprint
 
 
-@blueprint.route("/artist/<name>/")
+@blueprint.route("/artist/<path:name>/")
 @login_required
 def artist(name=None):
     sync_meta = get_argument('sync_meta')
@@ -93,7 +93,7 @@ def artist(name=None):
     )
 
 
-@blueprint.route("/tag/<name>/")
+@blueprint.route("/tag/<path:name>/")
 @login_required
 def tag(name=None):
     name = name.lower()

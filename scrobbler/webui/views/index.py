@@ -1,5 +1,5 @@
 from flask import redirect, render_template, url_for
-from flask.ext.login import current_user, login_required
+from flask.ext.login import current_user
 
 from scrobbler.webui.views import blueprint
 
