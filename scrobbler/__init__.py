@@ -5,6 +5,10 @@ from flask.ext.bcrypt import Bcrypt
 
 from ext_lastfm import LastFM
 
+
+__VERSION__ = '0.2'
+
+
 app = Flask(__name__)
 db = SQLAlchemy()
 login_manager = LoginManager()

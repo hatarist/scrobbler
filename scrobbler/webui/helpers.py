@@ -2,7 +2,7 @@ import datetime
 
 from flask import flash, request
 
-from scrobbler import app, db, login_manager
+from scrobbler import app, db, login_manager, __VERSION__
 from scrobbler.webui.consts import PERIODS
 from scrobbler.models import User
 
@@ -40,6 +40,11 @@ def timesince(time, now=None):
 @app.context_processor
 def periods():
     return {'PERIODS': PERIODS}
+
+
+@app.context_processor
+def project_version():
+    return {'PROJECT_VERSION': __VERSION__}
 
 
 @login_manager.user_loader

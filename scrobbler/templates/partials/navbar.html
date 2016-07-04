@@ -7,7 +7,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="{{ url_for('webui.index') }}">scrobbler</a>
+      <a class="navbar-brand" href="{{ url_for('webui.index') }}">
+        scrobbler
+        {% if current_user.is_authenticated %}
+          <sup>{{ PROJECT_VERSION }}</sup>
+        {% endif %}
+      </a>
     </div>
 
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
