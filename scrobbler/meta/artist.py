@@ -4,10 +4,7 @@ from scrobbler.models import Artist
 
 
 def sync(name, method=SYNC_META.INSERT_OR_UPDATE):
-    artist = (db.session.query(Artist)
-              .filter(Artist.name == name)
-              .first())
-
+    artist = db.session.query(Artist).filter(Artist.name == name).first()
     data = lastfm.artist(name)
 
     if not data:

@@ -170,13 +170,17 @@ def find_similar_tracks(field_name, top_artists_count, chunks, start_from):
 
 
 def fix_scrobble_length():
-    old_query = (db.session.query(Scrobble.artist, Scrobble.track)
-                 .filter(Scrobble.id < 134266)
-                 .group_by(Scrobble.artist, Scrobble.track))
+    old_query = (
+        db.session.query(Scrobble.artist, Scrobble.track)
+        .filter(Scrobble.id < 134266)
+        .group_by(Scrobble.artist, Scrobble.track)
+    )
 
-    new_query = (db.session.query(Scrobble.artist, Scrobble.track, func.avg(Scrobble.length))
-                 .filter(Scrobble.id >= 134266)
-                 .group_by(Scrobble.artist, Scrobble.track).all())
+    new_query = (
+        db.session.query(Scrobble.artist, Scrobble.track, func.avg(Scrobble.length))
+        .filter(Scrobble.id >= 134266)
+        .group_by(Scrobble.artist, Scrobble.track).all()
+    )
 
     new_data = {'{0} - {1}'.format(*scrobble): int(scrobble[2]) for scrobble in new_query}
 

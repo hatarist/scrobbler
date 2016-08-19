@@ -102,7 +102,7 @@ class Scrobble(db.Model, BaseScrobble):
     rating = db.Column(db.String(255))
 
     def __repr__(self):
-        return "<Scrobble #{id}: {artist} - {title}>".format(
+        return "<Scrobble #{id}: {artist} - {track}>".format(
             id=self.id,
             artist=self.artist,
             track=self.track
@@ -113,7 +113,7 @@ class NowPlaying(db.Model, BaseScrobble):
     __tablename__ = 'np'
 
     def __repr__(self):
-        return "<NP #{id}: {artist} - {title}>".format(
+        return "<NP #{id}: {artist} - {track}>".format(
             id=self.id,
             artist=self.artist,
             track=self.track

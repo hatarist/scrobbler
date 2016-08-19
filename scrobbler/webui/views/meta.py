@@ -56,23 +56,25 @@ def artist(name=None):
     scrobbles_per_year = {y: scrobbles_per_year.get(y, 0) for y in range(min_year, max_year + 1)}
     scrobbles_per_year = sorted(scrobbles_per_year.items())
 
-    top_albums = (db.session
-                  .query(scrobbles, Scrobble.album)
-                  .filter(Scrobble.user_id == current_user.id)
-                  .filter(Scrobble.artist == name)
-                  .group_by(Scrobble.album)
-                  .order_by(scrobbles.desc())
-                  .limit(count)
-                  .all())
+    top_albums = (
+        db.session.query(scrobbles, Scrobble.album)
+        .filter(Scrobble.user_id == current_user.id)
+        .filter(Scrobble.artist == name)
+        .group_by(Scrobble.album)
+        .order_by(scrobbles.desc())
+        .limit(count)
+        .all()
+    )
 
-    top_tracks = (db.session
-                  .query(scrobbles, Scrobble.track)
-                  .filter(Scrobble.user_id == current_user.id)
-                  .filter(Scrobble.artist == name)
-                  .group_by(Scrobble.track)
-                  .order_by(scrobbles.desc())
-                  .limit(count)
-                  .all())
+    top_tracks = (
+        db.session.query(scrobbles, Scrobble.track)
+        .filter(Scrobble.user_id == current_user.id)
+        .filter(Scrobble.artist == name)
+        .group_by(Scrobble.track)
+        .order_by(scrobbles.desc())
+        .limit(count)
+        .all()
+    )
 
     max_album_scrobbles = top_albums[0][0]
     max_track_scrobbles = top_tracks[0][0]
@@ -108,8 +110,7 @@ def tag(name=None):
     name = name.lower()
 
     top_artists = (
-        db.session.query(
-            Artist.name, Artist.tags[name].label('strength'), Artist.playcount)
+        db.session.query(Artist.name, Artist.tags[name].label('strength'), Artist.playcount)
         .filter(Artist.tags.has_key(name))
         .order_by(*sort_by)
         .all()
@@ -134,14 +135,18 @@ def search():
     if not search_query:
         abort(404)  # :D
 
-    artists = (db.session.query(Scrobble.artist)
-               .filter(Scrobble.user_id == current_user.id)
-               .filter(Scrobble.artist.ilike('%{}%'.format(search_query))).distinct()
-               .limit(count).all())
-    tracks = (db.session.query(Scrobble.artist, Scrobble.track)
-              .filter(Scrobble.user_id == current_user.id)
-              .filter(Scrobble.track.ilike('%{}%'.format(search_query))).distinct()
-              .limit(count).all())
+    artists = (
+        db.session.query(Scrobble.artist)
+        .filter(Scrobble.user_id == current_user.id)
+        .filter(Scrobble.artist.ilike('%{}%'.format(search_query))).distinct()
+        .limit(count).all()
+    )
+    tracks = (
+        db.session.query(Scrobble.artist, Scrobble.track)
+        .filter(Scrobble.user_id == current_user.id)
+        .filter(Scrobble.track.ilike('%{}%'.format(search_query))).distinct()
+        .limit(count).all()
+    )
 
     if not artists and not tracks:
         abort(404)

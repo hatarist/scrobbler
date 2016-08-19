@@ -20,14 +20,14 @@ def top_artists(period=None):
 
     scrobbles = func.count(Scrobble.artist).label('count')
     time_from = datetime.datetime.now() - datetime.timedelta(days=days)
-    chart = (db.session
-             .query(Scrobble.artist, scrobbles)
-             .group_by(Scrobble.artist)
-             .filter(Scrobble.user_id == current_user.id, Scrobble.played_at >= time_from)
-             .order_by(scrobbles.desc())
-             .limit(count)
-             .all()
-             )
+    chart = (
+        db.session.query(Scrobble.artist, scrobbles)
+        .group_by(Scrobble.artist)
+        .filter(Scrobble.user_id == current_user.id, Scrobble.played_at >= time_from)
+        .order_by(scrobbles.desc())
+        .limit(count)
+        .all()
+    )
 
     return render_template(
         'charts/top_artists.html',
@@ -46,14 +46,14 @@ def top_tracks(period=None):
 
     scrobbles = func.count(Scrobble.artist).label('count')
     time_from = datetime.datetime.now() - datetime.timedelta(days=days)
-    chart = (db.session
-             .query(Scrobble.artist, Scrobble.track, scrobbles)
-             .group_by(Scrobble.artist, Scrobble.track, Scrobble.user_id == current_user.id)
-             .filter(Scrobble.played_at >= time_from)
-             .order_by(scrobbles.desc())
-             .limit(count)
-             .all()
-             )
+    chart = (
+        db.session.query(Scrobble.artist, Scrobble.track, scrobbles)
+        .group_by(Scrobble.artist, Scrobble.track, Scrobble.user_id == current_user.id)
+        .filter(Scrobble.played_at >= time_from)
+        .order_by(scrobbles.desc())
+        .limit(count)
+        .all()
+    )
 
     return render_template(
         'charts/top_tracks.html',
@@ -77,18 +77,18 @@ def top_yearly_tracks():
     for year in range(year_from, year_to + 1):
         time_from = datetime.datetime(year, 1, 1)
         time_to = datetime.datetime(year, 12, 31, 23, 59, 59, 999999)
-        charts[year] = (db.session
-                        .query(Scrobble.artist, Scrobble.track, scrobbles)
-                        .filter(
-                            Scrobble.user_id == current_user.id,
-                            Scrobble.played_at >= time_from,
-                            Scrobble.played_at <= time_to
-                        )
-                        .group_by(Scrobble.artist, Scrobble.track)
-                        .order_by(scrobbles.desc())
-                        .limit(stat_count)
-                        .all()
-                        )
+        charts[year] = (
+            db.session.query(Scrobble.artist, Scrobble.track, scrobbles)
+            .filter(
+                Scrobble.user_id == current_user.id,
+                Scrobble.played_at >= time_from,
+                Scrobble.played_at <= time_to
+            )
+            .group_by(Scrobble.artist, Scrobble.track)
+            .order_by(scrobbles.desc())
+            .limit(stat_count)
+            .all()
+        )
 
     position_changes = {}
 
@@ -146,15 +146,15 @@ def top_yearly_artists():
     for year in range(year_from, year_to + 1):
         time_from = datetime.datetime(year, 1, 1)
         time_to = datetime.datetime(year, 12, 31, 23, 59, 59, 999999)
-        charts[year] = (db.session
-                        .query(Scrobble.artist, scrobbles)
-                        .filter(Scrobble.user_id == current_user.id)
-                        .filter(Scrobble.played_at >= time_from, Scrobble.played_at <= time_to)
-                        .group_by(Scrobble.artist)
-                        .order_by(scrobbles.desc())
-                        .limit(stat_count)
-                        .all()
-                        )
+        charts[year] = (
+            db.session.query(Scrobble.artist, scrobbles)
+            .filter(Scrobble.user_id == current_user.id)
+            .filter(Scrobble.played_at >= time_from, Scrobble.played_at <= time_to)
+            .group_by(Scrobble.artist)
+            .order_by(scrobbles.desc())
+            .limit(stat_count)
+            .all()
+        )
 
     position_changes = {}
 
