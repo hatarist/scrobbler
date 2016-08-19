@@ -29,14 +29,11 @@ def top_artists(period=None):
              .all()
              )
 
-    max_count = chart[0][1]
-    chart = enumerate(chart, start=1)
-
     return render_template(
         'charts/top_artists.html',
         period=period,
-        chart=chart,
-        max_count=max_count
+        chart=enumerate(chart, start=1),
+        max_count=chart[0][1] if chart else 0
     )
 
 
@@ -58,14 +55,11 @@ def top_tracks(period=None):
              .all()
              )
 
-    max_count = chart[0][2]
-    chart = enumerate(chart, start=1)
-
     return render_template(
         'charts/top_tracks.html',
         period=period,
-        chart=chart,
-        max_count=max_count
+        chart=enumerate(chart, start=1),
+        max_count=chart[0][2] if chart else 0
     )
 
 
