@@ -37,6 +37,16 @@ def timesince(time, now=None):
     return '%(number)d %(type)s ago' % {'number': count, 'type': name}
 
 
+@app.template_filter('bignum')
+def bignum(num):
+    magnitude = 0
+    while abs(num) >= 1000:
+        magnitude += 1
+        num /= 1000.0
+    # add more suffixes if you need them
+    return '%.2f%s' % (num, ['', 'K', 'M'][magnitude])
+
+
 @app.context_processor
 def periods():
     return {'PERIODS': PERIODS}

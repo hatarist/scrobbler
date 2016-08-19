@@ -96,11 +96,24 @@ def artist(name=None):
 @blueprint.route("/tag/<path:name>/")
 @login_required
 def tag(name=None):
+    sort_by = request.args.get('sort_by')
+
+    if sort_by == 'play_count':
+        sort_by = [Artist.playcount.desc()]
+    elif sort_by == 'tag_strength':
+        sort_by = [desc('strength')]
+    else:
+        sort_by = [desc('strength'), Artist.playcount.desc()]
+
     name = name.lower()
-    top_artists = (db.session.query(Artist.name, Artist.tags[name].label('count'))
-                   .filter(Artist.tags.has_key(name))
-                   .order_by(desc('count'), Artist.playcount.desc())
-                   .all())
+
+    top_artists = (
+        db.session.query(
+            Artist.name, Artist.tags[name].label('strength'), Artist.playcount)
+        .filter(Artist.tags.has_key(name))
+        .order_by(*sort_by)
+        .all()
+    )
     # top_artists = [(name, str) for (name, str, ) in top_artists]
 
     top_artists = enumerate(top_artists, start=1)
