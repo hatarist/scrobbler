@@ -23,7 +23,7 @@ def ajax_dashboard_per_hour():
     count = func.count(Scrobble.id).label('count')
     time = Scrobble.played_at
     hour = func.extract('hour', time).label('hour')
-    weekday = func.extract('dow', time).label('weekday')
+    weekday = func.extract('isodow', time).label('weekday')
     year = func.extract('year', time).label('year')
     month = func.extract('month', time).label('month')
 
@@ -37,7 +37,7 @@ def ajax_dashboard_per_hour():
         .filter(year_filter, month_filter, artist_filter)
         .group_by('weekday', 'hour').all()
     )
-    per_hour = [(d + 1, h + 1, v) for d, h, v in per_hour]
+    per_hour = [(d, h + 1, v) for d, h, v in per_hour]
     return dumps(per_hour)
 
 
