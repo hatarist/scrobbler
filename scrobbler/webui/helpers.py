@@ -44,7 +44,7 @@ def bignum(num):
         magnitude += 1
         num /= 1000.0
     # add more suffixes if you need them
-    return '%.2f%s' % (num, ['', 'K', 'M'][magnitude])
+    return '%.2f%s' % (num, ['', 'K', 'M'][magnitude]) if magnitude > 0 else num
 
 
 @app.context_processor

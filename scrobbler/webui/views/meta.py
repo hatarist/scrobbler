@@ -50,8 +50,8 @@ def artist(name=None):
     max_scrobbles_per_year = max(x[1] for x in scrobbles_per_year)
 
     # Fill with zeroes if years skipped
-    min_year = int(min(x[0] for x in scrobbles_per_year))
-    max_year = int(max(x[0] for x in scrobbles_per_year))
+    min_year = min(int(x[0]) for x in scrobbles_per_year)
+    max_year = max(int(x[0]) for x in scrobbles_per_year)
     scrobbles_per_year = dict(scrobbles_per_year)
     scrobbles_per_year = {y: scrobbles_per_year.get(y, 0) for y in range(min_year, max_year + 1)}
     scrobbles_per_year = sorted(scrobbles_per_year.items())
@@ -102,20 +102,21 @@ def tag(name=None):
 
     if sort_by == 'play_count':
         sort_by = [Artist.playcount.desc()]
+    elif sort_by == 'local_play_count':
+        sort_by = [Artist.local_playcount]
     elif sort_by == 'tag_strength':
         sort_by = [desc('strength')]
     else:
-        sort_by = [desc('strength'), Artist.playcount.desc()]
+        sort_by = [desc('strength'), Artist.local_playcount.desc()]
 
     name = name.lower()
 
     top_artists = (
-        db.session.query(Artist.name, Artist.tags[name].label('strength'), Artist.playcount)
+        db.session.query(Artist.name, Artist.tags[name].label('strength'), Artist.local_playcount, Artist.playcount)
         .filter(Artist.tags.has_key(name))
         .order_by(*sort_by)
         .all()
     )
-    # top_artists = [(name, str) for (name, str, ) in top_artists]
 
     top_artists = enumerate(top_artists, start=1)
 

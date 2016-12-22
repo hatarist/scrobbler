@@ -6,7 +6,7 @@ from scrobbler import db
 from scrobbler.api.consts import PONG, RADIO_HANDSHAKE, UPDATE_CHECK
 from scrobbler.api.helpers import (api_response, authenticate, md5,
                                    parse_auth_request, parse_np_request, parse_scrobble_request)
-from scrobbler.models import NowPlaying, Scrobble, Session, User
+from scrobbler.models import Artist, NowPlaying, Scrobble, Session, User
 
 blueprint = Blueprint('api', __name__)
 
@@ -96,9 +96,18 @@ def scrobble():
     session = db.session.query(Session).filter(Session.session_id == session_id).first()
 
     for data in scrobbles:
+        artist = db.session.query(Artist).filter(Artist.name == data['artist']).first()
+
+        artist_id = None
+
+        if artist:
+            artist_id = artist.id
+            artist.local_playcount += 1
+
         scrobble = Scrobble(
             user_id=session.user_id,
             played_at=data.pop('timestamp'),
+            artist_id=artist_id,
             **data
         )
         db.session.add(scrobble)

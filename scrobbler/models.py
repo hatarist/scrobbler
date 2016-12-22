@@ -100,6 +100,7 @@ class Scrobble(db.Model, BaseScrobble):
 
     source = db.Column(db.String(255))
     rating = db.Column(db.String(255))
+    artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=True)
 
     def __repr__(self):
         return "<Scrobble #{id}: {artist} - {track}>".format(
@@ -129,6 +130,7 @@ class Artist(db.Model):
     bio = db.Column(db.Text)
     image_url = db.Column(db.String(255))
     playcount = db.Column(db.Integer, default=0)
+    local_playcount = db.Column(db.Integer, default=0)
     mbid = db.Column(db.String(64))
     tags = db.Column(JSONB)
 

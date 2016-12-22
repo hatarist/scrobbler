@@ -25,7 +25,6 @@ def sync(name, method=SYNC_META.INSERT_OR_UPDATE):
         artist.image_url = data['image']
         artist.playcount = data['playcount']
         artist.tags = data['tags']
-        artist.save()
 
     db.session.commit()
 
