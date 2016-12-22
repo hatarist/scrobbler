@@ -1,6 +1,7 @@
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask.ext.login import current_user, login_required
-from sqlalchemy import desc, func
+from sqlalchemy import desc, func, cast
+from sqlalchemy.types import Integer
 
 from scrobbler import app, db, meta
 from scrobbler.models import Artist, Scrobble
@@ -103,7 +104,7 @@ def tag(name=None):
     if sort_by == 'play_count':
         sort_by = [Artist.playcount.desc()]
     elif sort_by == 'local_play_count':
-        sort_by = [Artist.local_playcount]
+        sort_by = [Artist.local_playcount.desc()]
     elif sort_by == 'tag_strength':
         sort_by = [desc('strength')]
     else:
@@ -112,7 +113,7 @@ def tag(name=None):
     name = name.lower()
 
     top_artists = (
-        db.session.query(Artist.name, Artist.tags[name].label('strength'), Artist.local_playcount, Artist.playcount)
+        db.session.query(Artist.name, Artist.tags[name].cast(Integer).label('strength'), Artist.local_playcount, Artist.playcount)
         .filter(Artist.tags.has_key(name))
         .order_by(*sort_by)
         .all()

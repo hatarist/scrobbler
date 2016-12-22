@@ -45,7 +45,7 @@ class LastFM(pylast.LastFMNetwork):
         data = {
             'name': None,
             'name_fixed': None,
-            'tags': [],
+            'tags': {},
             'bio': None,
             'image': None,
             'playcount': None,
@@ -58,7 +58,7 @@ class LastFM(pylast.LastFMNetwork):
             data['name_fixed'] = artist_info.get_correction()
 
             data['tags'] = artist_info.get_top_tags()
-            data['tags'] = {tag.item.name.lower(): tag.weight for tag in data['tags'][:tags]}
+            data['tags'] = {tag.item.name.lower(): int(tag.weight) for tag in data['tags'][:tags]}
 
             data['bio'] = artist_info.get_bio_summary()
             data['bio'] = data['bio'].replace('Read more on Last.fm', '')
