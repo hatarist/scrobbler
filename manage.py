@@ -64,6 +64,16 @@ def find_similar_tracks(field_name, count, chunks, index):
 
 
 @manager.command
+@manager.option('-l', '--limit', dest='limit', default=0, help='How many artists to download')
+def download_artist_metadata(limit):
+    """
+        Download artists' metadata from the Last.FM.
+    """
+    from scrobbler.commands.metadata import download_artist_metadata
+    download_artist_metadata(limit)
+
+
+@manager.command
 def fix_length():
     from scrobbler.commands.metadata import fix_scrobble_length
     fix_scrobble_length()

@@ -1,8 +1,9 @@
 from sqlalchemy import desc, func
 
 from scrobbler import db
+from scrobbler.meta.artist import sync
 from scrobbler.meta.helpers import n_i_fast_comp, n_i_levenshtein
-from scrobbler.models import DiffArtists, DiffTracks, Scrobble
+from scrobbler.models import Artist, DiffArtists, DiffTracks, Scrobble
 
 
 def find_similar_artists(field_name, chunks, start_from):
@@ -196,3 +197,16 @@ def fix_scrobble_length():
         scrobbles.update({'length': length})
 
     db.session.commit()
+
+
+def download_artist_metadata(limit):
+    artists = [obj[0] for obj in (
+        db.session.query(Scrobble.artist).group_by(Scrobble.artist)
+        .order_by(func.count(Scrobble.artist).desc())
+        .limit(limit).all()
+    )]
+
+    for artist in artists:
+        artist_obj = db.session.query(Artist).filter(Artist.name == artist).count()
+        if not artist_obj:
+            sync(artist)
