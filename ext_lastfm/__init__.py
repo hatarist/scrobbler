@@ -38,10 +38,11 @@ class LastFM(pylast.LastFMNetwork):
                            "that you are not overriding Last.FM servers in /etc/hosts")
 
     def artist(self, artist_name, tags=20):
+        """Retrieves artist metadata with additional stuff (bio, image, tags etc.)"""
+
         if not self._connected:
             self._connect()
 
-        """Retrieves artist metadata with additional stuff (bio, image, tags etc.)"""
         data = {
             'name': None,
             'name_fixed': None,

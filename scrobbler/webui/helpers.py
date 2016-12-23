@@ -75,3 +75,18 @@ def get_argument(arg_name, arg_type=None, default=0):
         return arg_type(request.args.get(arg_name))
     except (TypeError, ValueError):
         return default
+
+
+def range_to_datetime(s_from, s_to):
+    try:
+        dt_from = datetime.datetime.strptime(s_from, '%Y-%m-%d')
+    except ValueError:
+        dt_from = datetime.datetime.strptime(s_from, '%Y-%m-%d %H:%M:%S')
+
+    try:
+        dt_to = datetime.datetime.strptime(s_to, '%Y-%m-%d')
+        dt_to = dt_to + datetime.timedelta(days=1) - datetime.timedelta(microseconds=1)
+    except ValueError:
+        dt_to = datetime.datetime.strptime(s_to, '%Y-%m-%d %H:%M:%S')
+
+    return (dt_from, dt_to)

@@ -6,7 +6,11 @@
 {% endblock %}
 
 {% block title %}
-  Top {{ select_metatype('tracks') }} for {{ select_period('webui.top_tracks', period) }}
+  {% if custom_range %}
+    Top {{ select_metatype('tracks') }} from {{ time_from.strftime('%Y-%m-%d') }} to {{ time_to.strftime('%Y-%m-%d') }}
+  {% else %}
+    Top {{ select_metatype('tracks') }} for {{ select_period('webui.top_tracks', period) }}
+  {% endif %}
 {% endblock %}
 
 {% block content %}

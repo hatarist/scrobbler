@@ -1,39 +1,65 @@
 import datetime
 
-from flask import render_template
+from flask import render_template, request
 from flask.ext.login import current_user, login_required
 from sqlalchemy import func
 
 from scrobbler import app, db
 from scrobbler.models import Scrobble
 from scrobbler.webui.consts import PERIODS
-from scrobbler.webui.helpers import get_argument
+from scrobbler.webui.helpers import range_to_datetime
 from scrobbler.webui.views import blueprint
+
+
+def get_chart_params(period):
+    period, days = PERIODS.get(period, PERIODS['1w'])
+    time_from = request.args.get('from')
+    time_to = request.args.get('to')
+    custom_range = False
+    count = int(request.args.get('count', app.config['RESULTS_COUNT']))
+
+    if time_from is None or time_to is None:
+        time_from = datetime.datetime.now() - datetime.timedelta(days=days)
+        time_to = datetime.datetime.now()
+    else:
+        time_from, time_to = range_to_datetime(time_from, time_to)
+        custom_range = True
+
+    return {
+        'period': period,
+        'days': days,
+        'time_from': time_from,
+        'time_to': time_to,
+        'custom_range': custom_range,
+        'count': count,
+    }
 
 
 @blueprint.route("/top/artists/")
 @blueprint.route("/top/artists/<period>/")
 @login_required
 def top_artists(period=None):
-    period, days = PERIODS.get(period, PERIODS['1w'])
-    count = get_argument('count', default=app.config['RESULTS_COUNT'])
+    params = get_chart_params(period)
 
     scrobbles = func.count(Scrobble.artist).label('count')
-    time_from = datetime.datetime.now() - datetime.timedelta(days=days)
     chart = (
         db.session.query(Scrobble.artist, scrobbles)
         .group_by(Scrobble.artist)
-        .filter(Scrobble.user_id == current_user.id, Scrobble.played_at >= time_from)
+        .filter(
+            Scrobble.user_id == current_user.id,
+            Scrobble.played_at >= params['time_from'],
+            Scrobble.played_at <= params['time_to'],
+        )
         .order_by(scrobbles.desc())
-        .limit(count)
+        .limit(params['count'])
         .all()
     )
 
     return render_template(
         'charts/top_artists.html',
-        period=period,
         chart=enumerate(chart, start=1),
-        max_count=chart[0][1] if chart else 0
+        max_count=chart[0][1] if chart else 0,
+        **params
     )
 
 
@@ -41,25 +67,26 @@ def top_artists(period=None):
 @blueprint.route("/top/tracks/<period>/")
 @login_required
 def top_tracks(period=None):
-    period, days = PERIODS.get(period, PERIODS['1w'])
-    count = get_argument('count', default=app.config['RESULTS_COUNT'])
+    params = get_chart_params(period)
 
     scrobbles = func.count(Scrobble.artist).label('count')
-    time_from = datetime.datetime.now() - datetime.timedelta(days=days)
     chart = (
         db.session.query(Scrobble.artist, Scrobble.track, scrobbles)
         .group_by(Scrobble.artist, Scrobble.track, Scrobble.user_id == current_user.id)
-        .filter(Scrobble.played_at >= time_from)
+        .filter(
+            Scrobble.played_at >= params['time_from'],
+            Scrobble.played_at <= params['time_to'],
+        )
         .order_by(scrobbles.desc())
-        .limit(count)
+        .limit(params['count'])
         .all()
     )
 
     return render_template(
         'charts/top_tracks.html',
-        period=period,
         chart=enumerate(chart, start=1),
-        max_count=chart[0][2] if chart else 0
+        max_count=chart[0][2] if chart else 0,
+        **params
     )
 
 
@@ -69,8 +96,9 @@ def top_yearly_tracks():
     scrobbles = func.count(Scrobble.artist).label('count')
     charts = {}
 
-    year_from = 2006
-    year_to = 2016
+    col_year = func.extract('year', Scrobble.played_at)
+    year_from, year_to = db.session.query(func.min(col_year), func.max(col_year)).first()
+
     stat_count = 10000
     show_count = 100
 
@@ -138,8 +166,9 @@ def top_yearly_artists():
     scrobbles = func.count(Scrobble.artist).label('count')
     charts = {}
 
-    year_from = 2006
-    year_to = 2016
+    col_year = func.extract('year', Scrobble.played_at)
+    year_from, year_to = db.session.query(func.min(col_year), func.max(col_year)).first()
+
     stat_count = 1000
     show_count = 100
 
