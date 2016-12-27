@@ -1,4 +1,4 @@
-from sqlalchemy import desc, func
+from sqlalchemy import desc, func, text
 
 from scrobbler import db
 from scrobbler.meta.artist import sync
@@ -210,3 +210,62 @@ def download_artist_metadata(limit):
         artist_obj = db.session.query(Artist).filter(Artist.name == artist).count()
         if not artist_obj:
             sync(artist)
+
+
+def find_sequences():
+    query = text('''
+        SELECT
+            *,
+            EXTRACT(EPOCH FROM lag(scrobbles.ended_at) OVER w_s - scrobbles.played_at) AS time_delta,
+            EXTRACT(EPOCH FROM lag(scrobbles.ended_at) OVER w_s - scrobbles.played_at) > -120 AS step
+        FROM (
+            SELECT
+                id,
+                played_at,
+                played_at + interval '1 second' * length AS ended_at,
+                length,
+                artist || ' - ' || track AS track
+            FROM scrobbles
+            WHERE played_at::date >= '2016-01-01'
+            ORDER BY played_at
+        ) AS scrobbles
+        WINDOW w_s as (ORDER BY played_at)
+        ORDER BY played_at
+    ''')
+
+    result = list(db.engine.execute(query))
+
+    prev_step = None
+    seq_count = 1
+    seq_started_at = None
+    seq_ended_at = None
+    seq_tracks = []
+    seq_list = []
+
+    for track in result:
+        pk, started_at, ended_at, length, name, count, step = track
+        if step != prev_step:
+            if step or step is None:
+                seq_started_at = started_at
+                seq_count = 1
+                seq_tracks = [track]
+            else:
+                if seq_count > 1:
+                    seq_list.append({
+                        'started_at': seq_started_at.strftime('%F %H:%M:%S'),
+                        'ended_at': seq_ended_at.strftime('%F %H:%M:%S'),
+                        'count': seq_count,
+                        'tracks': seq_tracks
+                    })
+                    # print('sequence ended, count={0}, daterange={1} - {2}'.format(seq_count, seq_started_at, seq_ended_at))
+        else:
+            if step or step is None:
+                seq_count += 1
+                seq_ended_at = ended_at
+                seq_tracks.append(track)
+
+        prev_step = step
+
+    print("started_at\tended_at\tcount")
+    for seq in sorted(seq_list, key=lambda x: -x['count']):
+        print("{}\t{}\t{}".format(seq['started_at'], seq['ended_at'], seq['count']))

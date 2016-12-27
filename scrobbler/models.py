@@ -101,6 +101,7 @@ class Scrobble(db.Model, BaseScrobble):
     source = db.Column(db.String(255))
     rating = db.Column(db.String(255))
     artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=True)
+    album_id = db.Column(db.Integer, db.ForeignKey('albums.id'), nullable=True)
 
     def __repr__(self):
         return "<Scrobble #{id}: {artist} - {track}>".format(
@@ -133,6 +134,31 @@ class Artist(db.Model):
     local_playcount = db.Column(db.Integer, default=0)
     mbid = db.Column(db.String(64))
     tags = db.Column(JSONB)
+    genre = db.Column(db.String(64))
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return "<Artist #{id}: {artist}>".format(
+            id=self.id,
+            artist=self.name
+        )
+
+
+class Album(db.Model):
+    __tablename__ = 'albums'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=True)
+    artist = relationship("Artist")
+    date = db.Column(db.Date)
+    image_url = db.Column(db.String(255))
+    playcount = db.Column(db.Integer, default=0)
+    local_playcount = db.Column(db.Integer, default=0)
+    tags = db.Column(JSONB)
+    genre = db.Column(db.String(64))
 
     def __str__(self):
         return self.name

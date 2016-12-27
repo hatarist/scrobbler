@@ -79,5 +79,11 @@ def fix_length():
     fix_scrobble_length()
 
 
+@manager.command
+def find_sequences():
+    from scrobbler.commands.metadata import find_sequences
+    find_sequences()
+
+
 if __name__ == "__main__":
     manager.run()
