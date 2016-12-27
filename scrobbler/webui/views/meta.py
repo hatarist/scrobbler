@@ -1,6 +1,6 @@
 from flask import abort, flash, redirect, render_template, request, url_for
-from flask.ext.login import current_user, login_required
-from sqlalchemy import desc, func, cast
+from flask_login import current_user, login_required
+from sqlalchemy import desc, func
 from sqlalchemy.types import Integer
 
 from scrobbler import app, db, meta

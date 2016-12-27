@@ -1,7 +1,7 @@
 import datetime
 
 from flask import render_template, request
-from flask.ext.login import current_user, login_required
+from flask_login import current_user, login_required
 from sqlalchemy import func
 
 from scrobbler import app, db

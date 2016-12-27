@@ -34,7 +34,7 @@ class LastFM(pylast.LastFMNetwork):
 
             self._connected = True
         except pylast.MalformedResponseError:
-            logger.warning("[Flask.ext.LastFM] Got a malformed response. Please check "
+            logger.warning("[Flask_LastFM] Got a malformed response. Please check "
                            "that you are not overriding Last.FM servers in /etc/hosts")
 
     def artist(self, artist_name, tags=20):

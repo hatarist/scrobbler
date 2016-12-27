@@ -1,5 +1,5 @@
 from flask import abort, flash, redirect, render_template, url_for
-from flask.ext.login import current_user, login_required, login_user, logout_user
+from flask_login import current_user, login_required, login_user, logout_user
 
 from scrobbler import db
 from scrobbler.webui.forms import (

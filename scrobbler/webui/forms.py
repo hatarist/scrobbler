@@ -1,15 +1,15 @@
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import BooleanField, PasswordField, SelectField, StringField, SubmitField
 from wtforms.validators import Required, Optional, Length, EqualTo, Email
 
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     username = StringField('Username', validators=[Required()])
     password = PasswordField('Password', validators=[Required()])
     remember_me = BooleanField('Remember me')
 
 
-class RegisterForm(Form):
+class RegisterForm(FlaskForm):
     username = StringField('Username', [Required(), Length(min=3, max=32)])
     email = StringField('Email', [Optional(), Email()])
     password = PasswordField('Password', [
@@ -19,7 +19,7 @@ class RegisterForm(Form):
     repeat_password = PasswordField('Repeat password')
 
 
-class BaseChangePasswordForm(Form):
+class BaseChangePasswordForm(FlaskForm):
     current_password = PasswordField('Current password', [Required()])
     password = PasswordField('New password', [
         Required(),
@@ -36,7 +36,7 @@ class ChangeWebUIPasswordForm(BaseChangePasswordForm):
     webui_pass = SubmitField('Change password')
 
 
-class CorrectionForm(Form):
+class CorrectionForm(FlaskForm):
     CHOICES = (
         ('artist', 'Artist'),
         ('track', 'Track'),

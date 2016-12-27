@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from flask.ext.script import Manager
+from flask_script import Manager
 
 from scrobbler.wsgi import app, db
 
