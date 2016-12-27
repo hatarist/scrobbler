@@ -36,7 +36,7 @@ class User(db.Model):
 
     @webui_password.setter
     def _set_webui_password(self, data):
-        self._webui_password = bcrypt.generate_password_hash(data)
+        self._webui_password = bcrypt.generate_password_hash(data).decode('utf-8')
 
     def validate_api_password(self, data):
         return self.api_password == md5(data)
