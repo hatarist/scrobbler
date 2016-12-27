@@ -1,6 +1,7 @@
 import datetime
 
 from flask import Blueprint, redirect, request, url_for
+from sqlalchemy.dialects.postgresql import insert
 
 from scrobbler import db
 from scrobbler.api.consts import PONG, RADIO_HANDSHAKE, UPDATE_CHECK
@@ -104,13 +105,24 @@ def scrobble():
             artist_id = artist.id
             artist.local_playcount += 1
 
-        scrobble = Scrobble(
+        # PG 9.5+: DO NOTHING if duplicate
+        query = insert(Scrobble).values(
             user_id=session.user_id,
             played_at=data.pop('timestamp'),
             artist_id=artist_id,
             **data
+        ).on_conflict_do_nothing(
+            index_elements=['played_at', 'artist', 'track']
         )
-        db.session.add(scrobble)
+        db.session.execute(query)
+
+        # scrobble = Scrobble(
+        #     user_id=session.user_id,
+        #     played_at=data.pop('timestamp'),
+        #     artist_id=artist_id,
+        #     **data
+        # )
+        # db.session.add(scrobble)
 
     db.session.commit()
 

@@ -98,6 +98,7 @@ class BaseScrobble(object):
 class Scrobble(db.Model, BaseScrobble):
     __tablename__ = 'scrobbles'
 
+    created_at = db.Column(db.DateTime(timezone=True), default=datetime.now)
     source = db.Column(db.String(255))
     rating = db.Column(db.String(255))
     artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=True)
