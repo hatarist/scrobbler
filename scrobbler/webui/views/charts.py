@@ -98,6 +98,7 @@ def top_yearly_tracks():
 
     col_year = func.extract('year', Scrobble.played_at)
     year_from, year_to = db.session.query(func.min(col_year), func.max(col_year)).first()
+    year_from, year_to = int(year_from), int(year_to)
 
     stat_count = 10000
     show_count = 100
@@ -168,6 +169,7 @@ def top_yearly_artists():
 
     col_year = func.extract('year', Scrobble.played_at)
     year_from, year_to = db.session.query(func.min(col_year), func.max(col_year)).first()
+    year_from, year_to = int(year_from), int(year_to)
 
     stat_count = 1000
     show_count = 100
