@@ -27,7 +27,7 @@ def ajax_dashboard_per_hour():
     year = func.extract('year', time).label('year')
     month = func.extract('month', time).label('month')
 
-    year_filter = (year >= 2009) if arg_year == 'all' else (year == arg_year)
+    year_filter = True if arg_year == 'all' else (year == arg_year)
     month_filter = True if arg_month == 'all' else (month == arg_month)
     artist_filter = True if arg_artist == '' else (Scrobble.artist == arg_artist)
 
@@ -68,8 +68,9 @@ def last_scrobbles():
 def unique_monthly():
     stats = {}
 
-    year_from = 2006
-    year_to = 2016
+    col_year = func.extract('year', Scrobble.played_at)
+    year_from, year_to = db.session.query(func.min(col_year), func.max(col_year)).first()
+    year_from, year_to = int(year_from), int(year_to)
 
     for year in range(year_from, year_to + 1):
         for month in range(1, 13):
@@ -116,8 +117,9 @@ def unique_monthly():
 def unique_yearly():
     stats = {}
 
-    year_from = 2006
-    year_to = 2016
+    col_year = func.extract('year', Scrobble.played_at)
+    year_from, year_to = db.session.query(func.min(col_year), func.max(col_year)).first()
+    year_from, year_to = int(year_from), int(year_to)
 
     for year in range(year_from, year_to + 1):
         time_from = datetime.datetime(year, 1, 1)
