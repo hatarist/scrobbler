@@ -73,6 +73,7 @@ def now_playing():
         return api_response('BADSESSION')
 
     data.pop('session_id', None)
+    data['user_id'] = session.user_id
     data['played_at'] = datetime.datetime.now()
     np = NowPlaying(**data)
     db.session.add(np)

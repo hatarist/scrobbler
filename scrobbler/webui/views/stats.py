@@ -57,7 +57,8 @@ def last_scrobbles():
     nowplaying = (
         db.session.query(NowPlaying.id, NowPlaying.artist, NowPlaying.track, NowPlaying.played_at)
         .filter(NowPlaying.user_id == current_user.id)
-        .last()
+        .order_by(NowPlaying.played_at.desc())
+        .first()
     )
 
     return render_template('latest.html', scrobbles=scrobbles, nowplaying=nowplaying)
