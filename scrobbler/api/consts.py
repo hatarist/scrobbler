@@ -39,6 +39,8 @@ AUTH_KEY_MAPPING = {
     'u': 'username',
     't': 'timestamp',
     'time': 'timestamp',
+    'username': 'username',
+    'auth': 'auth',
 }
 
 SCROBBLE_KEY_MAPPING = {
