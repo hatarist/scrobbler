@@ -20,7 +20,7 @@
             style="display: inline; width: 100px; text-align: right">
             year: <span id="yearpicker-value">all</span>
         </label>
-        <input style="width: 180px;" type="range" min="2006" max="2016" value="2016" id="yearpicker" disabled>
+        <input style="width: 180px;" type="range" min="{{ year_min }}" max="{{ year_max }}" value="{{ year_max }}" id="yearpicker" disabled>
 
         <input type="checkbox" id="monthpicker-enabled" />
         <label for="monthpicker" 

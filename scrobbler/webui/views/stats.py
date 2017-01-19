@@ -185,7 +185,13 @@ def milestones():
 def dashboard(period=None):
     period, days = PERIODS.get(period, PERIODS['1w'])
 
+    col_year = func.extract('year', Scrobble.played_at)
+    year_from, year_to = db.session.query(func.min(col_year), func.max(col_year)).first()
+    year_from, year_to = int(year_from), int(year_to)
+
     return render_template(
         'dashboard.html',
-        period=period
+        period=period,
+        year_min=year_from,
+        year_max=year_to,
     )
