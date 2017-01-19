@@ -12,6 +12,7 @@
       <tr class="nowplaying">
         <td class="id">now</td>
         <td class="name"><a href="{{ url_for('webui.artist', name=nowplaying.artist) }}">{{ nowplaying.artist }}</a> – {{ nowplaying.track }}</td>
+        <td class="token"><span class="label label-default">{{ nowplaying.token.name }}</span></td>
         <td class="time"><span title="{{ nowplaying.played_at }}">{{ nowplaying.played_at|timesince }}</span></td>
       </tr>
     {% endif %}
@@ -19,6 +20,7 @@
       <tr>
         <td class="id">{{ scrobble.id }}</td>
         <td class="name"><a href="{{ url_for('webui.artist', name=scrobble.artist) }}">{{ scrobble.artist }}</a> – {{ scrobble.track }}</td>
+        <td class="token"><span class="label label-default">{{ scrobble.token.name }}</span></td>
         <td class="time"><span title="{{ scrobble.played_at }}">{{ scrobble.played_at|timesince }}</span></td>
       </tr>
     {% endfor %}

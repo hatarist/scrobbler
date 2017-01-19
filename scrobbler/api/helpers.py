@@ -15,10 +15,20 @@ def api_response(*lines):
 
 
 def authenticate(user, timestamp, auth):
-    if user is None or auth != md5(user.api_password + timestamp):
-        return False
+    """
+    Returns a tuple of (User, Token.id).
+    """
+    if user is None:
+        return (None, None)
 
-    return user
+    if auth == md5(user.api_password + timestamp):
+        return (user, None)
+    else:
+        for token in user.tokens:
+            if auth == md5(token.key + timestamp):
+                return (user, token.id)
+
+    return (None, None)
 
 
 def parse_auth_request(args):

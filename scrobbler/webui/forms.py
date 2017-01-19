@@ -29,11 +29,17 @@ class BaseChangePasswordForm(FlaskForm):
 
 
 class ChangeAPIPasswordForm(BaseChangePasswordForm):
-    api_pass = SubmitField('Change password')
+    api_password_submit = SubmitField('Change password')
 
 
 class ChangeWebUIPasswordForm(BaseChangePasswordForm):
-    webui_pass = SubmitField('Change password')
+    webui_password_submit = SubmitField('Change password')
+
+
+class AddTokenForm(FlaskForm):
+    name = StringField('Token', validators=[Required()])
+    key = PasswordField('Key', validators=[Required()])
+    token_submit = SubmitField('Add token')
 
 
 class CorrectionForm(FlaskForm):

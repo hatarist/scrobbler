@@ -9,18 +9,47 @@ from scrobbler import bcrypt, db
 from scrobbler.api.helpers import md5
 
 
+class Token(db.Model):
+    __tablename__ = 'tokens'
+
+    id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.now)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    name = db.Column(db.String(64))
+    _key = db.Column('key', db.String(32))
+
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+
+    @hybrid_property
+    def key(self):
+        return self._key
+
+    @key.setter
+    def _set_key(self, data):
+        self._key = md5(data)
+
+    def __repr__(self):
+        return "<Token {user_id}/{name}>".format(user_id=self.user_id, name=self.name)
+
+
 class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.now)
     username = db.Column(db.String(32), unique=True)
     email = db.Column(db.String(255), unique=True)
     _api_password = db.Column('api_password', db.String(32))
     _webui_password = db.Column('webui_password', db.String(128))
     is_active = db.Column(db.Boolean, default=True, nullable=False)
-    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.now)
-
     sessions = db.relationship('Session', backref='user')
+    tokens = db.relationship(
+        'Token',
+        backref='user',
+        primaryjoin="and_(Token.user_id == User.id, Token.is_active)",
+    )
 
     @hybrid_property
     def api_password(self):
@@ -69,9 +98,14 @@ class Session(db.Model):
     __tablename__ = 'sessions'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     session_id = db.Column(db.String(32))
-    created_at = db.Column(db.DateTime(timezone=True))
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    token_id = db.Column(db.Integer, db.ForeignKey('tokens.id'), nullable=True)
+    token = relationship('Token')
+
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.now)
+    updated_at = db.Column(db.DateTime(timezone=True), nullable=True)
 
 
 class BaseScrobble(object):
@@ -98,11 +132,13 @@ class BaseScrobble(object):
 class Scrobble(db.Model, BaseScrobble):
     __tablename__ = 'scrobbles'
 
-    created_at = db.Column(db.DateTime(timezone=True), default=datetime.now)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.now)
     source = db.Column(db.String(255))
     rating = db.Column(db.String(255))
     artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=True)
     album_id = db.Column(db.Integer, db.ForeignKey('albums.id'), nullable=True)
+    token_id = db.Column(db.Integer, db.ForeignKey('tokens.id'), nullable=True)
+    token = relationship('Token')
 
     def __repr__(self):
         return "<Scrobble #{id}: {artist} - {track}>".format(
@@ -114,6 +150,9 @@ class Scrobble(db.Model, BaseScrobble):
 
 class NowPlaying(db.Model, BaseScrobble):
     __tablename__ = 'np'
+
+    token_id = db.Column(db.Integer, db.ForeignKey('tokens.id'), nullable=True)
+    token = relationship('Token')
 
     def __repr__(self):
         return "<NP #{id}: {artist} - {track}>".format(
@@ -153,7 +192,7 @@ class Album(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=True)
-    artist = relationship("Artist")
+    artist = relationship('Artist')
     date = db.Column(db.Date)
     image_url = db.Column(db.String(255))
     playcount = db.Column(db.Integer, default=0)
@@ -237,7 +276,7 @@ class TrackCorrection(BaseCorrection, db.Model):
     __tablename__ = 'correction_tracks'
 
     artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=False)
-    artist = relationship("Artist")
+    artist = relationship('Artist')
 
 
 class TagCorrection(BaseCorrection, db.Model):

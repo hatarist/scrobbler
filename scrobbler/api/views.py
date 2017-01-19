@@ -25,24 +25,36 @@ def handshake():
         return api_response('BADREQUEST'), 400
 
     user = db.session.query(User).filter_by(username=data['username']).first()
-    if not authenticate(user, data['timestamp'], data['auth']):
+    user, token_id = authenticate(user, data['timestamp'], data['auth'])
+
+    if user is None:
         return api_response('BADAUTH')
 
-    session = db.session.query(Session).filter(Session.user_id == user.id).first()
+    session = db.session.query(Session).filter(
+        Session.user_id == user.id,
+        Session.token_id == token_id
+    ).first()
+
+    current_time = datetime.datetime.now()
 
     if session:
-        session_id = session.session_id
+        session.updated_at = current_time
     else:
-        current_time = datetime.datetime.now()
-        session_id = md5(user.username + user.api_password + current_time.strftimek('%s'))
-
-        session = Session(user_id=user.id, session_id=session_id, created_at=current_time)
+        session_id = md5(user.username + user.api_password + current_time.strftime('%s'))
+        session = Session(
+            user_id=user.id,
+            token_id=token_id,
+            session_id=session_id,
+            created_at=current_time,
+            updated_at=current_time,
+        )
         db.session.add(session)
-        db.session.commit()
+
+    db.session.commit()
 
     return api_response(
         'OK',
-        session_id,
+        session.session_id,
         'http://post.audioscrobbler.com:80/np_1.2',
         'http://post.audioscrobbler.com:80/protocol_1.2',
     )
@@ -55,7 +67,9 @@ def password_check():
         return api_response('BADREQUEST'), 400
 
     user = db.session.query(User).filter_by(username=data['username']).first()
-    if not authenticate(user, data['timestamp'], data['auth']):
+    user, token_id = authenticate(user, data['timestamp'], data['auth'])
+
+    if user is None:
         return api_response('BADPASSWORD')
 
     return api_response('OK')
@@ -74,6 +88,7 @@ def now_playing():
 
     data.pop('session_id', None)
     data['user_id'] = session.user_id
+    data['token_id'] = session.token_id
     data['played_at'] = datetime.datetime.now()
     np = NowPlaying(**data)
     db.session.add(np)
@@ -92,7 +107,6 @@ def scrobble():
 
     for data in scrobbles:
         artist = db.session.query(Artist).filter(Artist.name == data['artist']).first()
-
         artist_id = None
 
         if artist:
@@ -102,6 +116,7 @@ def scrobble():
         # PG 9.5+: DO NOTHING if duplicate
         query = insert(Scrobble).values(
             user_id=session.user_id,
+            token_id=session.token_id,
             played_at=data.pop('timestamp'),
             artist_id=artist_id,
             **data

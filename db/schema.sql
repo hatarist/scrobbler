@@ -1,6 +1,7 @@
 CREATE TABLE scrobbles (
     id integer NOT NULL,
     user_id integer NOT NULL,
+    token_id integer NULL,
     created_at timestamp with time zone NOT NULL,
     played_at timestamp with time zone NOT NULL,
     artist character varying(255) NOT NULL,
@@ -28,6 +29,7 @@ ALTER SEQUENCE scrobbles_id_seq OWNED BY scrobbles.id;
 ALTER TABLE ONLY scrobbles ALTER COLUMN id SET DEFAULT nextval('scrobbles_id_seq'::regclass);
 ALTER TABLE ONLY scrobbles ADD CONSTRAINT scrobbles_pkey PRIMARY KEY (id);
 ALTER TABLE ONLY scrobbles ADD CONSTRAINT scrobbles_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id);
+ALTER TABLE ONLY scrobbles ADD CONSTRAINT scrobbles_token_id_fkey FOREIGN KEY (token_id) REFERENCES tokens(id) ON DELETE SET NULL;
 ALTER TABLE ONLY scrobbles ADD CONSTRAINT scrobbles_artist_id_fkey FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE SET NULL;
 
 CREATE INDEX scrobbles_artist_id_idx ON scrobbles USING btree (artist_id);

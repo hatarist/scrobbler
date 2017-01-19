@@ -8,7 +8,7 @@ from flask_login import current_user, login_required
 from sqlalchemy import func
 
 from scrobbler import app, db
-from scrobbler.models import NowPlaying, Scrobble
+from scrobbler.models import NowPlaying, Scrobble, Token
 from scrobbler.webui.helpers import get_argument
 from scrobbler.webui.consts import PERIODS
 from scrobbler.webui.views import blueprint
@@ -47,7 +47,7 @@ def last_scrobbles():
     count = get_argument('count', default=app.config['RESULTS_COUNT'])
 
     scrobbles = (
-        db.session.query(Scrobble.id, Scrobble.artist, Scrobble.track, Scrobble.played_at)
+        db.session.query(Scrobble)
         .filter(Scrobble.user_id == current_user.id)
         .order_by(Scrobble.played_at.desc())
         .limit(count)
@@ -55,7 +55,7 @@ def last_scrobbles():
     )
 
     nowplaying = (
-        db.session.query(NowPlaying.id, NowPlaying.artist, NowPlaying.track, NowPlaying.played_at)
+        db.session.query(NowPlaying)
         .filter(NowPlaying.user_id == current_user.id)
         .order_by(NowPlaying.played_at.desc())
         .first()

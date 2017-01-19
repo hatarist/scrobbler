@@ -71,6 +71,19 @@ tr.nowplaying,
     width: 60px;
 }
 
+.chart .token {
+    font-size: 0.9em;
+    text-align: right;
+    vertical-align: middle;
+    width: 120px;
+}
+
+.chart .token .label {
+    font-weight: normal;
+    text-transform: lowercase;
+    background-color: #bbb;
+}
+
 .chart .time {
     font-size: 0.85em;
     text-align: right;
