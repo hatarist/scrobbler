@@ -72,17 +72,10 @@ def now_playing():
     if session is None:
         return api_response('BADSESSION')
 
-    np = db.session.query(NowPlaying).filter(NowPlaying.user_id == session.user_id)
-
     data.pop('session_id', None)
     data['played_at'] = datetime.datetime.now()
-
-    if np.first() is None:
-        np = NowPlaying(**data)
-        db.session.add(np)
-    else:
-        np.update(data)
-
+    np = NowPlaying(**data)
+    db.session.add(np)
     db.session.commit()
 
     return api_response('OK')
@@ -115,7 +108,7 @@ def scrobble():
             index_elements=['played_at', 'artist', 'track']
         )
         db.session.execute(query)
-
+        # PG <9.5
         # scrobble = Scrobble(
         #     user_id=session.user_id,
         #     played_at=data.pop('timestamp'),
