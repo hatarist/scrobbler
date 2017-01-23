@@ -67,11 +67,10 @@ def parse_scrobble_request(args):
         if k_index not in scrobbles:
             scrobbles[k_index] = {}
 
-        if k_readable_name in ('timestamp', 'length'):
-            value = int(value)
-
         if k_readable_name == 'timestamp':
-            value = datetime.datetime.fromtimestamp(value)
+            value = datetime.datetime.fromtimestamp(int(value))
+        elif k_readable_name == 'length':
+            value = datetime.timedelta(seconds=int(value))
 
         scrobbles[k_index][k_readable_name] = value
 

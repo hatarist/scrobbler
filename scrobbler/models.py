@@ -122,7 +122,7 @@ class BaseScrobble(object):
     track = db.Column(db.String(255), nullable=False)
     album = db.Column(db.String(255))
     tracknumber = db.Column(db.String(255))
-    length = db.Column(db.Integer, nullable=False)
+    length = db.Column(db.Interval, nullable=False)
     musicbrainz = db.Column(db.String(255))
 
     def __str__(self):

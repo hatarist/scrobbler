@@ -11,7 +11,7 @@ CREATE TABLE scrobbles (
     album character varying(255),
     album_id integer,
     tracknumber character varying(255),
-    length integer NOT NULL,
+    length interval NOT NULL,
     musicbrainz character varying(255),
     source character varying(255),
     rating character varying(255)
@@ -32,8 +32,12 @@ ALTER TABLE ONLY scrobbles ADD CONSTRAINT scrobbles_user_id_fkey FOREIGN KEY (us
 ALTER TABLE ONLY scrobbles ADD CONSTRAINT scrobbles_token_id_fkey FOREIGN KEY (token_id) REFERENCES tokens(id) ON DELETE SET NULL;
 ALTER TABLE ONLY scrobbles ADD CONSTRAINT scrobbles_artist_id_fkey FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE SET NULL;
 
+CREATE INDEX scrobbles_user_id_idx ON scrobbles USING btree (user_id);
 CREATE INDEX scrobbles_artist_id_idx ON scrobbles USING btree (artist_id);
 CREATE INDEX scrobbles_artist_idx ON scrobbles USING btree (lower((artist)::text));
 CREATE INDEX scrobbles_played_at_idx ON scrobbles USING btree (played_at);
 CREATE INDEX scrobbles_track_idx ON scrobbles USING btree (lower((track)::text));
 CREATE UNIQUE INDEX scrobbles_unique_idx ON scrobbles (played_at, artist, track);
+
+CREATE INDEX np_played_at_idx ON np USING btree (played_at);
+CREATE INDEX np_user_id_idx ON np USING btree (user_id);
