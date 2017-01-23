@@ -56,7 +56,8 @@ def last_scrobbles():
 
     nowplaying = (
         db.session.query(NowPlaying)
-        .filter(NowPlaying.user_id == current_user.id)
+        .filter(NowPlaying.user_id == current_user.id,
+                NowPlaying.played_at + NowPlaying.length >= func.now())
         .order_by(NowPlaying.played_at.desc())
         .first()
     )
