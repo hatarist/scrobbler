@@ -7,7 +7,7 @@ from scrobbler import db
 from scrobbler.api.consts import PONG, RADIO_HANDSHAKE, UPDATE_CHECK
 from scrobbler.api.helpers import (api_response, authenticate, md5,
                                    parse_auth_request, parse_np_request, parse_scrobble_request)
-from scrobbler.models import Artist, NowPlaying, Scrobble, Session, User
+from scrobbler.models import Album, Artist, NowPlaying, Scrobble, Session, User
 
 blueprint = Blueprint('api', __name__)
 
@@ -108,10 +108,20 @@ def scrobble():
     for data in scrobbles:
         artist = db.session.query(Artist).filter(Artist.name == data['artist']).first()
         artist_id = None
+        album_id = None
 
         if artist:
             artist_id = artist.id
             artist.local_playcount += 1
+
+            album = db.session.query(Album).filter(
+                Album.artist_id == artist_id,
+                Album.name == data['album']
+            ).first()
+
+            if album:
+                album_id = album.id
+                album.local_playcount += 1
 
         # PG 9.5+: DO NOTHING if duplicate
         query = insert(Scrobble).values(
@@ -119,6 +129,7 @@ def scrobble():
             token_id=session.token_id,
             played_at=data.pop('timestamp'),
             artist_id=artist_id,
+            album_id=album_id,
             **data
         ).on_conflict_do_nothing(
             index_elements=['user_id', 'played_at', 'artist', 'track']
