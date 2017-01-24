@@ -14,7 +14,7 @@
     </tr>
     {% for scrobble in scrobbles %}
       <tr>
-        <td>{{ scrobble.id }}</td>
+        <td>{{ scrobble.seq_id }}</td>
         <td>{{ scrobble.played_at|timesince }}</td>
         <td><a href="{{ url_for('webui.artist', name=scrobble.artist) }}">{{ scrobble.artist }}</a> – {{ scrobble.track }}</td>
       </tr>

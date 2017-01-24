@@ -41,3 +41,12 @@ CREATE INDEX scrobbles_user_id_and_played_at_idx ON scrobbles (user_id, played_a
 CREATE UNIQUE INDEX scrobbles_unique_idx ON scrobbles (user_id, played_at, artist, track);
 
 CREATE INDEX np_played_at_idx ON np (user_id, played_at);
+
+-- A view for the per-user's milestones
+CREATE VIEW scrobbles_seq AS (
+    SELECT
+        row_number() OVER (PARTITION BY user_id ORDER BY played_at) AS seq_id,
+        *
+    FROM scrobbles
+    ORDER BY played_at
+);

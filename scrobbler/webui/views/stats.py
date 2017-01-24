@@ -5,7 +5,7 @@ from json import dumps
 
 from flask import render_template, request
 from flask_login import current_user, login_required
-from sqlalchemy import func
+from sqlalchemy import func, text
 
 from scrobbler import app, db
 from scrobbler.models import NowPlaying, Scrobble, Token
@@ -165,14 +165,8 @@ def unique_yearly():
 def milestones():
     step = get_argument('step', default=10000)
 
-    max_id = db.session.query(func.max(Scrobble.id).label('max_id')).first().max_id
-    m_list = range(step, max_id, step)
-    scrobbles = (
-        db.session.query(Scrobble)
-        .filter(Scrobble.user_id == current_user.id)
-        .filter(Scrobble.id.in_(m_list))
-        .order_by(Scrobble.id.desc())
-    )
+    query = text('SELECT * FROM scrobbles_seq WHERE user_id = :user_id AND seq_id % :step = 0')
+    scrobbles = db.engine.execute(query, {'user_id': current_user.id, 'step': step})
 
     return render_template(
         'stats/milestones.html',

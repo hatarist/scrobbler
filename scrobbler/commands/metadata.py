@@ -222,11 +222,10 @@ def find_sequences():
             SELECT
                 id,
                 played_at,
-                played_at + interval '1 second' * length AS ended_at,
+                played_at + length AS ended_at,
                 length,
                 artist || ' - ' || track AS track
             FROM scrobbles
-            WHERE played_at::date >= '2016-01-01'
             ORDER BY played_at
         ) AS scrobbles
         WINDOW w_s as (ORDER BY played_at)
