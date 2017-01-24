@@ -121,7 +121,7 @@ def scrobble():
             artist_id=artist_id,
             **data
         ).on_conflict_do_nothing(
-            index_elements=['played_at', 'artist', 'track']
+            index_elements=['user_id', 'played_at', 'artist', 'track']
         )
         db.session.execute(query)
         # PG <9.5
