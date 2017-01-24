@@ -3,6 +3,7 @@ DEBUG = True
 
 # Flask / Flask-Login
 SECRET_KEY = 'ChangeMe'
+SIGNUP_ENABLED = False
 
 # Flask-Bcrypt
 BCRYPT_LOG_ROUNDS = 12
@@ -21,3 +22,4 @@ LASTFM_API_KEY = ""
 LASTFM_API_SECRET = ""
 LASTFM_USERNAME = ""
 LASTFM_PASSWORD = ""
+

@@ -1,7 +1,7 @@
 from flask import abort, flash, redirect, render_template, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
-from scrobbler import db
+from scrobbler import app, db
 from scrobbler.webui.forms import (
     AddTokenForm,
     ChangeAPIPasswordForm,
@@ -16,8 +16,9 @@ from scrobbler.models import Token, User
 
 @blueprint.route("/register/", methods=["GET", "POST"])
 def register():
-    flash('The pool is closed. :(', category='error')
-    return redirect(url_for('webui.index'))
+    if not app.config['SIGNUP_ENABLED']:
+        flash('The pool is closed. :(', category='error')
+        return redirect(url_for('webui.index'))
 
     form = RegisterForm()
 

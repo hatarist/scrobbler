@@ -10,6 +10,9 @@ from scrobbler.api.helpers import md5
 
 
 class Token(db.Model):
+    """
+    An optional user "password" to link the scrobble to.
+    """
     __tablename__ = 'tokens'
 
     id = db.Column(db.Integer, primary_key=True)

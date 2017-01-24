@@ -57,6 +57,11 @@ def project_version():
     return {'PROJECT_VERSION': __VERSION__}
 
 
+@app.context_processor
+def signup_enabled():
+    return {'SIGNUP_ENABLED': app.config['SIGNUP_ENABLED']}
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.query(User).get(user_id)

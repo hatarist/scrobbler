@@ -112,7 +112,9 @@
           </li>
         {% else %}
           <li><a href="{{ url_for('webui.login') }}">Log in</a></li>
-          <li><a href="{{ url_for('webui.register') }}">Register</a></li>
+          {% if SIGNUP_ENABLED %}
+            <li><a href="{{ url_for('webui.register') }}">Register</a></li>
+          {% endif %}
         {% endif %}
       </ul>
     </div>
