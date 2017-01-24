@@ -18,18 +18,18 @@
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
 
-        {# +- title, login_required, admin_required, urls #}
+        {# +- title, login_required, urls #}
         {# +-- url, login_required, title #}
         {% set elements = [
-          ("Dashboard", True, False, [
+          ("Dashboard", True, [
             (url_for('webui.dashboard'), True, "Dashboard")
           ]),
 
-          ("Latest", True, False, [
+          ("Latest", True, [
             (url_for('webui.last_scrobbles'), True, "Latest")
           ]),
 
-          ("Charts", True, False, [
+          ("Charts", True, [
             (url_for('webui.top_artists'), True, "Top Artists"),
             (url_for('webui.top_tracks'), True, "Top Tracks"),
             ('---'),
@@ -37,21 +37,15 @@
             (url_for('webui.top_yearly_tracks'), True, "Top Yearly Tracks"),
           ]),
 
-          ("Stats", True, False, [
+          ("Stats", True, [
             (url_for('webui.milestones'), True, "Milestones"),
             ('---'),
             (url_for('webui.unique_yearly'), True, "Unique Yearly"),
             (url_for('webui.unique_monthly'), True, "Unique Monthly"),
           ]),
-
-          ("Maintenance", True, True, [
-            (url_for('webui.maintenance_artists'), True, "Artists"),
-            (url_for('webui.maintenance_tracks'), True, "Tracks"),
-            (url_for('webui.maintenance_corrections'), True, "Corrections"),
-          ]),
         ] %}
 
-        {% for name, login_required, admin_required, urls in elements %}
+        {% for name, login_required, urls in elements %}
           {% if urls|length > 1 %}
             {% if (not login_required or (login_required and current_user.is_authenticated)) and (not admin_required or (admin_required and current_user.is_admin)) %}
               <li class="dropdown {% for url, _, subname in urls %}{% if url in request.path %}active{% endif %}{% endfor %}">
@@ -98,6 +92,20 @@
 
       <ul class="nav navbar-nav navbar-right">
         {% if current_user.is_authenticated %}
+          {% if current_user.is_admin %}
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                Admin<span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu">
+                <li class="dropdown-header">Maintenance</li>
+                <li><a href="{{ url_for('webui.maintenance_artists') }}">Artists</a></li>
+                <li><a href="{{ url_for('webui.maintenance_tracks') }}">Tracks</a></li>
+                <li><a href="{{ url_for('webui.maintenance_corrections') }}">Corrections</a></li>
+              </ul>
+            </li>
+          {% endif %}
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
               <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
