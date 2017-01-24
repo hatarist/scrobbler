@@ -6,7 +6,7 @@ from flask_bcrypt import Bcrypt
 from ext_lastfm import LastFM
 
 
-__VERSION__ = '0.2'
+__VERSION__ = '0.3'
 
 
 app = Flask(__name__)
