@@ -32,12 +32,12 @@ ALTER TABLE ONLY scrobbles ADD CONSTRAINT scrobbles_user_id_fkey FOREIGN KEY (us
 ALTER TABLE ONLY scrobbles ADD CONSTRAINT scrobbles_token_id_fkey FOREIGN KEY (token_id) REFERENCES tokens(id) ON DELETE SET NULL;
 ALTER TABLE ONLY scrobbles ADD CONSTRAINT scrobbles_artist_id_fkey FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE SET NULL;
 
-CREATE INDEX scrobbles_user_id_idx ON scrobbles USING btree (user_id);
-CREATE INDEX scrobbles_artist_id_idx ON scrobbles USING btree (artist_id);
-CREATE INDEX scrobbles_artist_idx ON scrobbles USING btree (lower((artist)::text));
-CREATE INDEX scrobbles_played_at_idx ON scrobbles USING btree (played_at);
-CREATE INDEX scrobbles_track_idx ON scrobbles USING btree (lower((track)::text));
-CREATE UNIQUE INDEX scrobbles_unique_idx ON scrobbles (played_at, artist, track);
+CREATE INDEX scrobbles_user_id_idx ON scrobbles (user_id);
+CREATE INDEX scrobbles_artist_id_idx ON scrobbles (artist_id);
+CREATE INDEX scrobbles_artist_idx ON scrobbles (lower((artist)::text));
+CREATE INDEX scrobbles_played_at_idx ON scrobbles (played_at);
+CREATE INDEX scrobbles_track_idx ON scrobbles (lower((track)::text));
+CREATE INDEX scrobbles_user_id_and_played_at_idx ON scrobbles (user_id, played_at);
+CREATE UNIQUE INDEX scrobbles_unique_idx ON scrobbles (user_id, played_at, artist, track);
 
-CREATE INDEX np_played_at_idx ON np USING btree (played_at);
-CREATE INDEX np_user_id_idx ON np USING btree (user_id);
+CREATE INDEX np_played_at_idx ON np (user_id, played_at);
