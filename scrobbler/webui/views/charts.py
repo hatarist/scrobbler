@@ -74,6 +74,7 @@ def top_tracks(period=None):
         db.session.query(Scrobble.artist, Scrobble.track, scrobbles)
         .group_by(Scrobble.artist, Scrobble.track, Scrobble.user_id == current_user.id)
         .filter(
+            Scrobble.user_id == current_user.id,
             Scrobble.played_at >= params['time_from'],
             Scrobble.played_at <= params['time_to'],
         )
@@ -179,8 +180,11 @@ def top_yearly_artists():
         time_to = datetime.datetime(year, 12, 31, 23, 59, 59, 999999)
         charts[year] = (
             db.session.query(Scrobble.artist, scrobbles)
-            .filter(Scrobble.user_id == current_user.id)
-            .filter(Scrobble.played_at >= time_from, Scrobble.played_at <= time_to)
+            .filter(
+                Scrobble.user_id == current_user.id,
+                Scrobble.played_at >= time_from,
+                Scrobble.played_at <= time_to
+            )
             .group_by(Scrobble.artist)
             .order_by(scrobbles.desc())
             .limit(stat_count)
