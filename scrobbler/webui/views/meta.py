@@ -31,8 +31,7 @@ def artist(name=None):
 
     total_scrobbles, first_time_heard = (
         db.session.query(scrobbles, first_time)
-        .filter(Scrobble.user_id == current_user.id)
-        .filter(Scrobble.artist == name)
+        .filter(Scrobble.user_id == current_user.id, Scrobble.artist == name)
         .order_by(scrobbles.desc()).first()
     )
 
@@ -43,7 +42,7 @@ def artist(name=None):
 
     scrobbles_per_year = (
         db.session.query(year, scrobbles)
-        .filter(Scrobble.artist == name)
+        .filter(Scrobble.user_id == current_user.id, Scrobble.artist == name)
         .group_by(Scrobble.artist, 'year')
         .order_by(year).all()
     )
@@ -63,7 +62,7 @@ def artist(name=None):
         .filter(Scrobble.artist == name)
         .group_by(Scrobble.album)
         .order_by(scrobbles.desc())
-        .limit(count)
+        .limit(app.config['ARTIST_TOP_ALBUMS_COUNT'])
         .all()
     )
 
@@ -73,7 +72,7 @@ def artist(name=None):
         .filter(Scrobble.artist == name)
         .group_by(Scrobble.track)
         .order_by(scrobbles.desc())
-        .limit(count)
+        .limit(app.config['ARTIST_TOP_TRACKS_COUNT'])
         .all()
     )
 

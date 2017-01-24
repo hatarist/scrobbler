@@ -11,39 +11,6 @@
 {% block content %}
 <div class="row">
   <div class="col-md-7">
-    {% if artist.tags %}
-      {% for tag in artist.tags %}
-        <a href="{{ url_for('webui.tag', name=tag) }}"><span class="label label-default">{{ tag }}</span></a>
-      {% endfor %}
-      <hr>
-    {% endif %}
-
-    {% if artist.bio %}
-      <h4>Biography</h4>
-      {{ artist.bio }}
-      <hr>
-    {% endif %}
-
-    <h4>Scrobbles per year</h4>
-    <table class="table table-striped table-condensed table-hover chart">
-      {% for year, scrobbles in scrobbles_per_year %}
-        <tr>
-          <td class="place">{{ year|int }}</td>
-          <td class="scrobbles">
-            {% if scrobbles %}
-              <div class="progress">
-                <div class="progress-bar" role="progressbar" aria-valuenow="{{ scrobbles }}" aria-valuemin="0" aria-valuemax="{{ max_scrobbles_per_year }}" style="width: {{ ((scrobbles / max_scrobbles_per_year) * 100)|int }}%;">
-                  <span>{{ scrobbles }}</span>
-                </div>
-              </div>
-            {% else %}
-              <span class="progress-bar" style="color: #000;">0</span>
-            {% endif %}
-          </td>
-        </tr>
-      {% endfor %}
-    </table>
-
     <h4>Top tracks</h4>
     <table class="table table-striped table-condensed table-hover chart">
       {# <tr><th class="place">#</th><th class="name">Track</th><th class="scrobbles">Scrobbles</th></tr> #}
@@ -84,6 +51,39 @@
   <div class="col-md-5">
     {% if artist.image_url %}
       <img class="artist_image" src="{{ artist.image_url }}">
+      <hr>
+    {% endif %}
+
+    <h6>Scrobbles per year</h6>
+    <table class="table table-condensed chart">
+      {% for year, scrobbles in scrobbles_per_year %}
+        <tr>
+          <td class="place">{{ year|int }}</td>
+          <td class="scrobbles">
+            {% if scrobbles %}
+              <div class="progress">
+                <div class="progress-bar" role="progressbar" aria-valuenow="{{ scrobbles }}" aria-valuemin="0" aria-valuemax="{{ max_scrobbles_per_year }}" style="width: {{ ((scrobbles / max_scrobbles_per_year) * 100)|int }}%;">
+                  <span>{{ scrobbles }}</span>
+                </div>
+              </div>
+            {% else %}
+              <span class="progress-bar" style="color: #000;">0</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+
+    {% if artist.tags %}
+      {% for tag in artist.tags %}
+        <a href="{{ url_for('webui.tag', name=tag) }}"><span class="label label-default">{{ tag }}</span></a>
+      {% endfor %}
+      <hr>
+    {% endif %}
+
+    {% if artist.bio %}
+      <h4>Biography</h4>
+      {{ artist.bio }}
     {% endif %}
   </div>
 </div>
