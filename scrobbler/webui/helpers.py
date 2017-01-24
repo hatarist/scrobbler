@@ -1,10 +1,23 @@
 import datetime
+from functools import wraps
 
-from flask import flash, request
+from flask import flash, redirect, request, url_for
+from flask_login import current_user
 
 from scrobbler import app, db, login_manager, __VERSION__
 from scrobbler.webui.consts import PERIODS
 from scrobbler.models import User
+
+
+def admin_required(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if app.login_manager._login_disabled:
+            return func(*args, **kwargs)
+        elif not current_user.is_authenticated or not current_user.is_admin:
+            return app.login_manager.unauthorized()
+        return func(*args, **kwargs)
+    return decorated_view
 
 
 @app.template_filter('timesince')

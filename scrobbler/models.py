@@ -47,6 +47,7 @@ class User(db.Model):
     _api_password = db.Column('api_password', db.String(32))
     _webui_password = db.Column('webui_password', db.String(128))
     is_active = db.Column(db.Boolean, default=True, nullable=False)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
     sessions = db.relationship('Session', backref='user')
     tokens = db.relationship(
         'Token',

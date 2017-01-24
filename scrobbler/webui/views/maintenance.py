@@ -1,5 +1,4 @@
 from flask import abort, flash, redirect, render_template, request, url_for
-from flask_login import login_required
 from sqlalchemy import desc, func
 
 from scrobbler import db
@@ -12,12 +11,12 @@ from scrobbler.models import (
     TrackCorrection,
 )
 from scrobbler.webui.forms import CorrectionForm
-from scrobbler.webui.helpers import get_argument, show_form_errors
+from scrobbler.webui.helpers import admin_required, get_argument, show_form_errors
 from scrobbler.webui.views import blueprint
 
 
 @blueprint.route("/maintenance/artists/")
-@login_required
+@admin_required
 def maintenance_artists():
     show_ignored = get_argument('show_ignored', arg_type=bool)
 
@@ -39,7 +38,7 @@ def maintenance_artists():
 
 
 @blueprint.route("/maintenance/artists/<int:id>/<int:direction>/")
-@login_required
+@admin_required
 def maintenance_artist_fix(id, direction):
     diff = db.session.query(DiffArtists).get(id)
 
@@ -70,7 +69,7 @@ def maintenance_artist_fix(id, direction):
 
 
 @blueprint.route("/maintenance/tracks/")
-@login_required
+@admin_required
 def maintenance_tracks():
     show_ignored = get_argument('show_ignored', arg_type=bool)
     arg_artist = request.args.get('artist', '')
@@ -111,7 +110,7 @@ def maintenance_tracks():
 
 
 @blueprint.route("/maintenance/tracks/<int:id>/<int:direction>/")
-@login_required
+@admin_required
 def maintenance_track_fix(id, direction):
     diff = db.session.query(DiffTracks).get(id)
 
@@ -146,7 +145,7 @@ def maintenance_track_fix(id, direction):
 
 
 @blueprint.route("/maintenance/corrections/", methods=["GET", "POST"])
-@login_required
+@admin_required
 def maintenance_corrections():
     form = CorrectionForm()
 
@@ -182,7 +181,7 @@ def maintenance_corrections():
 
 
 @blueprint.route("/maintenance/corrections/<type>/<int:id>/delete/")
-@login_required
+@admin_required
 def maintenance_corrections_delete(type, id):
     if type == 'artist':
         model = ArtistCorrection
