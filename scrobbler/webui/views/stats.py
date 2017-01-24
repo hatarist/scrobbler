@@ -8,7 +8,7 @@ from flask_login import current_user, login_required
 from sqlalchemy import func, text
 
 from scrobbler import app, db
-from scrobbler.models import NowPlaying, Scrobble, Token
+from scrobbler.models import NowPlaying, Scrobble
 from scrobbler.webui.helpers import get_argument
 from scrobbler.webui.consts import PERIODS
 from scrobbler.webui.views import blueprint
@@ -71,7 +71,15 @@ def unique_monthly():
     stats = {}
 
     col_year = func.extract('year', Scrobble.played_at)
-    year_from, year_to = db.session.query(func.min(col_year), func.max(col_year)).first()
+    year_from, year_to = (
+        db.session.query(func.min(col_year), func.max(col_year))
+        .filter(Scrobble.user_id == current_user.id)
+        .first()
+    )
+
+    if not year_from or not year_to:
+        return render_template('stats/unique.html', stats=stats)
+
     year_from, year_to = int(year_from), int(year_to)
 
     for year in range(year_from, year_to + 1):
@@ -120,7 +128,15 @@ def unique_yearly():
     stats = {}
 
     col_year = func.extract('year', Scrobble.played_at)
-    year_from, year_to = db.session.query(func.min(col_year), func.max(col_year)).first()
+    year_from, year_to = (
+        db.session.query(func.min(col_year), func.max(col_year))
+        .filter(Scrobble.user_id == current_user.id)
+        .first()
+    )
+
+    if not year_from or not year_to:
+        return render_template('stats/unique.html', stats=stats)
+
     year_from, year_to = int(year_from), int(year_to)
 
     for year in range(year_from, year_to + 1):
@@ -181,8 +197,16 @@ def dashboard(period=None):
     period, days = PERIODS.get(period, PERIODS['1w'])
 
     col_year = func.extract('year', Scrobble.played_at)
-    year_from, year_to = db.session.query(func.min(col_year), func.max(col_year)).first()
-    year_from, year_to = int(year_from), int(year_to)
+    year_from, year_to = (
+        db.session.query(func.min(col_year), func.max(col_year))
+        .filter(Scrobble.user_id == current_user.id)
+        .first()
+    )
+
+    if not year_from or not year_to:
+        year_from, year_to = (datetime.date.today().year,) * 2
+    else:
+        year_from, year_to = int(year_from), int(year_to)
 
     return render_template(
         'dashboard.html',

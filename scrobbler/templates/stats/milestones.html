@@ -18,6 +18,8 @@
         <td>{{ scrobble.played_at|timesince }}</td>
         <td><a href="{{ url_for('webui.artist', name=scrobble.artist) }}">{{ scrobble.artist }}</a> – {{ scrobble.track }}</td>
       </tr>
+    {% else %}
+      <tr><td colspan="3">No data :(</td></tr>
     {% endfor %}
   </table>
 </div>

@@ -98,11 +98,24 @@ def top_yearly_tracks():
     charts = {}
 
     col_year = func.extract('year', Scrobble.played_at)
-    year_from, year_to = db.session.query(func.min(col_year), func.max(col_year)).first()
-    year_from, year_to = int(year_from), int(year_to)
+    year_from, year_to = (
+        db.session.query(func.min(col_year), func.max(col_year))
+        .filter(Scrobble.user_id == current_user.id)
+        .first()
+    )
 
     stat_count = 10000
     show_count = 100
+
+    if not year_from or not year_to:
+        return render_template(
+            'charts/top_yearly_tracks.html',
+            charts={},
+            position_changes={},
+            show_count=show_count,
+        )
+
+    year_from, year_to = int(year_from), int(year_to)
 
     for year in range(year_from, year_to + 1):
         time_from = datetime.datetime(year, 1, 1)
@@ -158,7 +171,7 @@ def top_yearly_tracks():
         'charts/top_yearly_tracks.html',
         charts=charts,
         position_changes=position_changes,
-        show_count=show_count
+        show_count=show_count,
     )
 
 
@@ -169,11 +182,24 @@ def top_yearly_artists():
     charts = {}
 
     col_year = func.extract('year', Scrobble.played_at)
-    year_from, year_to = db.session.query(func.min(col_year), func.max(col_year)).first()
-    year_from, year_to = int(year_from), int(year_to)
+    year_from, year_to = (
+        db.session.query(func.min(col_year), func.max(col_year))
+        .filter(Scrobble.user_id == current_user.id)
+        .first()
+    )
 
     stat_count = 1000
     show_count = 100
+
+    if not year_from or not year_to:
+        return render_template(
+            'charts/top_yearly_artists.html',
+            charts={},
+            position_changes={},
+            show_count=show_count,
+        )
+
+    year_from, year_to = int(year_from), int(year_to)
 
     for year in range(year_from, year_to + 1):
         time_from = datetime.datetime(year, 1, 1)
@@ -217,5 +243,5 @@ def top_yearly_artists():
         'charts/top_yearly_artists.html',
         charts=charts,
         position_changes=position_changes,
-        show_count=show_count
+        show_count=show_count,
     )
