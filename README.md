@@ -14,9 +14,23 @@ Written using Python 3.4+.
 ## Installation
     
     pip install -r requirements.txt
+    
     cp scrobbler/config.py.example scrobbler/config.py
-    $EDITOR scrobbler/config.py
-
+    
+    patch scrobbler/config.py <<EOF
+    @@ -5,2 +5,2 @@
+    -SECRET_KEY = 'ChangeMe'
+    +SECRET_KEY = '$(echo $RANDOM | openssl sha256 | cut -c10-)'
+    -SIGNUP_ENABLED = False
+    +SIGNUP_ENABLED = True
+    EOF
+    
+    # maybe edit SQLALCHEMY_DATABASE_URI
+    ${EDITOR-nano} scrobbler/config.py
+    
+    sudo -u postgres createuser -P scrobbler
+    sudo -u postgres createdb -O scrobbler scrobbler 
+    
     python manage.py initdb
     python manage.py runserver
 
@@ -27,7 +41,14 @@ Make sure that the application server works on the 80 port.
 Add the corresponding entries to the `/etc/hosts` file on the client machines you wish to scrobble from.  
 Example:
 
+    {
+    cat <<'EOF'
+    
+    # scrobbler server redirects
     127.0.0.1 ws.audioscrobbler.com
     127.0.0.1 post.audioscrobbler.com
     127.0.0.1 post2.audioscrobbler.com
+    
+    EOF
+    } | sudo tee -a /etc/hosts
 
