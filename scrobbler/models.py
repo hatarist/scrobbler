@@ -30,7 +30,7 @@ class Token(db.Model):
         return self._key
 
     @key.setter
-    def _set_key(self, data):
+    def key(self, data):
         self._key = md5(data)
 
     def __repr__(self):
@@ -60,7 +60,7 @@ class User(db.Model):
         return self._api_password
 
     @api_password.setter
-    def _set_api_password(self, data):
+    def api_password(self, data):
         self._api_password = md5(data)
 
     @hybrid_property
@@ -68,7 +68,7 @@ class User(db.Model):
         return self._webui_password
 
     @webui_password.setter
-    def _set_webui_password(self, data):
+    def webui_password(self, data):
         self._webui_password = bcrypt.generate_password_hash(data).decode('utf-8')
 
     def validate_api_password(self, data):
